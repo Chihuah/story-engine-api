@@ -394,34 +394,6 @@ dice_result = response.json()
 - [ ] 行動應用程式版本
 - [ ] 虛擬實境整合
 
-## 🤝 貢獻指南
-
-歡迎貢獻程式碼、回報問題或提出建議！
-
-### 如何貢獻
-
-1. **Fork 專案**
-2. **建立功能分支**：`git checkout -b feature/amazing-feature`
-3. **提交變更**：`git commit -m 'Add amazing feature'`
-4. **推送分支**：`git push origin feature/amazing-feature`
-5. **建立 Pull Request**
-
-### 程式碼規範
-
-- 遵循 PEP 8 Python 編碼規範
-- 新增適當的註解和文件
-- 撰寫測試案例
-- 確保所有測試通過
-
-### 回報問題
-
-請使用 GitHub Issues 回報問題，並提供：
-
-- 詳細的問題描述
-- 重現步驟
-- 預期行為 vs 實際行為
-- 環境資訊（Python 版本、作業系統等）
-
 ## 📄 授權條款
 
 本專案採用 MIT 授權條款。詳細內容請參考 [LICENSE](LICENSE) 檔案。
@@ -432,7 +404,7 @@ dice_result = response.json()
 - **SQLAlchemy**：強大的 Python ORM 工具
 - **Render**：便利的雲端部署平台
 - **OpenAI**：GPT 技術和 Function Calling 功能
-- **AI 代理人**：Manus AI
+- **AI Agent**：Manus AI
 
 ---
 
