@@ -1,0 +1,53 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "story_engine",
+        "description": "載入故事章節內容與選項，支援根據遊戲狀態進行條件內容解析。用於驅動互動式冒險故事的章節導航。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "chapter_id": {
+              "type": "integer",
+              "description": "要載入的章節 ID，從 1 開始的正整數",
+              "minimum": 1
+            },
+            "game_state": {
+              "type": "object",
+              "description": "當前遊戲狀態變數，用於條件內容解析。例如：{'found_secret_path': true, 'has_key': false}",
+              "additionalProperties": true
+            }
+          },
+          "required": ["chapter_id"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "roll_dice",
+        "description": "執行擲骰子檢定，支援多面數與多顆骰子。用於解決故事中的隨機事件和技能檢定。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dice_sides": {
+              "type": "integer",
+              "description": "骰子的面數（如 6 代表六面骰，20 代表二十面骰）",
+              "minimum": 2,
+              "maximum": 100
+            },
+            "dice_count": {
+              "type": "integer",
+              "description": "要擲的骰子數量",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "required": ["dice_sides", "dice_count"]
+        }
+      }
+    }
+  ]
+}
+
