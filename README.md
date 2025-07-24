@@ -432,12 +432,7 @@ dice_result = response.json()
 - **SQLAlchemy**：強大的 Python ORM 工具
 - **Render**：便利的雲端部署平台
 - **OpenAI**：GPT 技術和 Function Calling 功能
-
-## 📞 聯絡資訊
-
-- **專案維護者**：Manus AI
-- **GitHub**：[https://github.com/yourusername/story-engine-api](https://github.com/yourusername/story-engine-api)
-- **問題回報**：[GitHub Issues](https://github.com/yourusername/story-engine-api/issues)
+- **AI 代理人**：Manus AI
 
 ---
 
