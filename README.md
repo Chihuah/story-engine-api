@@ -322,7 +322,7 @@ DEBUG=False
    python seed_data.py --import example_simple_story.json  # 載入範例故事
    ```
 
-2. **使用自編故事**：
+2. **使用自創故事**：
 
    ```bash
    python seed_data.py --export my_story.json   # 匯出模板
@@ -337,6 +337,12 @@ DEBUG=False
    python story_converter.py story.json --stats # 查看統計
    python story_converter.py story.json --flowchart story.mmd  # 生成流程圖
    ```
+
+### 自創故事
+
+#### 利用 AI 來創作互動式冒險故事
+
+可利用 [AI_STORY_CREATION_GUIDE.md](AI_STORY_CREATION_GUIDE.md) 此故事生成指引（提示詞/上下文脈絡），給予大型語言模型來創作。並且搭配 [example_simple_story.json](example_simple_story.json) 做為範例，使其生成符合本專案的 json 格式。自創故事可用上述管理工具驗證後匯入至資料庫。
 
 ## 🧪 測試
 
@@ -481,21 +487,21 @@ dice_result = response.json()
 
 ### 短期目標
 
-- [ ] 新增更多故事內容和分支
+- [ ] 新增更多故事情節內容和分支(AI 輔助故事生成，使用自創故事指引來創作)
 - [ ] 實作角色屬性和道具系統
 - [ ] 加入戰鬥機制和技能檢定
-- [ ] 支援多語言內容
+- [ ] 實作玩家進度儲存
+- [ ] 後端資料庫收錄多本故事劇情，提供玩家選擇切換
 
 ### 中期目標
 
+- [ ] 支援多語言內容
 - [ ] 開發故事編輯器介面
-- [ ] 實作玩家進度儲存
-- [ ] 新增圖片和音效支援
+- [ ] 新增（由 AI 生成的）圖片、語音與音效支援
 - [ ] 建立故事分享社群
 
 ### 長期目標
 
-- [ ] AI 輔助故事生成
 - [ ] 多人協作冒險模式
 - [ ] 行動應用程式版本
 - [ ] 虛擬實境整合
