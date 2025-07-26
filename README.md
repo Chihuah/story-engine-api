@@ -175,6 +175,10 @@ GPTs 自訂模型 ──┐
 
 ## 📦 部署指南
 
+### 本地部署測試
+
+用於測試的本地部署，步驟請參考 [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md)
+
 ### Render 雲端部署
 
 詳細的部署步驟請參考 [DEPLOYMENT.md](DEPLOYMENT.md)
@@ -284,30 +288,32 @@ http://localhost:8000/docs
 ## 📁 專案結構
 
 ```
-story-engine-api/
+project/
 ├── main.py                    # FastAPI 主程式
-├── models.py                  # SQLAlchemy 資料模型
-├── schemas.py                 # Pydantic 資料結構
-├── seed_data.py               # 種子資料匯入腳本
-├── test_api.py                # API 測試腳本
-├── requirements.txt           # Python 套件需求
-├── Procfile                   # Render 部署配置
-├── .env.example               # 環境變數範本
-├── gpt_tools_definition.json  # GPT 工具定義
-├── README.md                  # 專案說明（本檔案）
-├── DEPLOYMENT.md              # 部署指南
-└── GPT_INTEGRATION.md         # GPT 整合指南
+├── models.py                  # 定義資料庫模型的 SQLAlchemy 程式碼
+├── schemas.py                 # 定義 API 請求與回應的 Pydantic 資料結構
+├── seed_data.py               # 初始化資料庫的種子資料腳本
+├── test_api.py                # 測試 API 功能的腳本
+├── test_db_connection.py     # 測試資料庫連線的腳本
+├── requirements.txt           # Python 套件需求清單
+├── Procfile                   # Render 平台的部署配置檔案
+├── .env.example               # 環境變數設定範例檔案
+├── gpt_tools_definition.json  # 定義 GPT 工具的 JSON 檔案
+├── README.md                  # 專案的主要說明文件
+├── DEPLOYMENT.md              # 部署指南文件
+├── LOCAL_DEVELOPMENT.md      # 本地開發環境設定指南
+└── GPT_INTEGRATION.md         # GPT 整合指南文件
 ```
 
 ## 🔧 技術規格
 
 ### 後端技術
 
-- **FastAPI 0.104.1**：現代化的 Python Web 框架
-- **SQLAlchemy 2.0.23**：Python SQL 工具包和 ORM
+- **FastAPI**：現代化的 Python Web 框架
+- **SQLAlchemy**：Python SQL 工具包和 ORM
 - **PostgreSQL**：關聯式資料庫
-- **Pydantic 2.5.0**：資料驗證和設定管理
-- **Uvicorn 0.24.0**：ASGI 伺服器
+- **Pydantic**：資料驗證和設定管理
+- **Uvicorn**：ASGI 伺服器
 
 ### API 規格
 
