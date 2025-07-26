@@ -43,8 +43,8 @@ GPTs 自訂模型 ──┐
 {
   "chapter_id": 2,
   "game_state": {
-    "found_secret_path": true,
-    "has_key": false
+    "health": 60,
+    "drank_water": false
   }
 }
 ```
@@ -53,23 +53,26 @@ GPTs 自訂模型 ──┐
 
 ```json
 {
-  "chapter_id": 2,
-  "title": "找人聊聊",
-  "content": "你們決定先去宮裡的人間清楚前因後果...",
+  "id": 2,
+  "title": "主要小徑",
+  "content": "你沿著寬闊的小徑深入森林，陽光透過樹葉... ...井水看起來清澈見底，而木箱則散發著歲月的氣息。\n\n[[IF has_weapon]]你握緊手中的劍，準備應對可能的危險。[[ENDIF]]\n\n你注意到木箱上有一把簡單的鎖，但看起來並不牢固。",
   "options": [
     {
-      "text": "研究詛咒的解除方法",
-      "next_id": 4
+      "text": "喝一些井水補充體力",
+      "next_id": 4,
+      "game_state": {
+        "health": 120,
+        "drank_water": true
+      }
     },
     {
-      "text": "尋找歐司崔特的把柄",
-      "next_id": 5
+      "text": "嘗試打開木箱",
+      "next_id": 5,
+      "game_state": {
+        "opened_chest": true
+      }
     }
-  ],
-  "game_state": {
-    "found_secret_path": true,
-    "has_key": false
-  }
+  ]
 }
 ```
 
@@ -297,22 +300,15 @@ DEBUG=False
 
 本專案提供一個簡單的範例故事（`example_simple_story.json`）：
 
-- **7 個章節**：森林探險主題
-- **4 個結局**：勇敢面對、明智撤退、準備充分、謹慎選擇
-- **條件內容**：根據是否擁有武器顯示不同內容
-- **分支設計**：展示基本的故事分支邏輯
+- **21 個章節**：森林探險主題
+- **多重結局（7 個）**：每個結局都反映不同的遊戲狀態
+- **條件內容**：使用 `[[IF condition]]...[[ENDIF]]` 語法，展示裝備狀態影響或玩家行為後果等
+- **分支設計**：玩家選擇真正影響故事走向
+- **狀態追蹤**：展示遊戲狀態變數的使用
 
 ### 故事結構
 
-```
-第1章：森林入口
-├── 第2章：森林深處
-│   ├── 第4章：遭遇野獸（結局一）
-│   └── 第5章：逃跑（結局二）
-└── 第3章：發現線索
-├── 第6章：有備而來（結局三）
-└── 第7章：安全第一（結局四）
-```
+<img src="ExampleSimpleStoryMermaidChart.svg" width="75%">
 
 ### 管理故事內容
 
