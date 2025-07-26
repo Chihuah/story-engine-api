@@ -103,6 +103,66 @@ GPTs 自訂模型 ──┐
 }
 ```
 
+### 3. 故事管理系統
+
+完整的故事內容管理工具集，支援故事的建立、編輯、驗證和轉換。
+
+**核心工具：**
+
+#### `seed_data.py` - 故事資料管理
+
+```bash
+python seed_data.py                          # 載入預設故事
+python seed_data.py --import story.json      # 匯入故事檔案
+python seed_data.py --export story.json      # 匯出故事檔案
+python seed_data.py --export-db backup.json  # 從資料庫匯出
+python seed_data.py --list                   # 列出所有章節
+python seed_data.py --clear                  # 清除所有資料
+```
+
+#### `story_validator.py` - 故事驗證
+
+```bash
+python story_validator.py story.json         # 驗證故事檔案
+```
+
+驗證項目：
+
+- ✅ 基本結構和必要欄位
+- 🔗 章節引用完整性
+- 🧠 邏輯結構（起始章節、結局章節、孤立章節）
+- ⚙️ 條件語法正確性
+- 📝 內容品質檢查
+
+#### `story_converter.py` - 格式轉換
+
+```bash
+python story_converter.py story.json --csv story.csv           # 轉為 CSV
+python story_converter.py story.json --markdown story.md       # 轉為 Markdown
+python story_converter.py story.json --flowchart story.mmd     # 轉為流程圖
+python story_converter.py story.json --stats                   # 顯示統計
+```
+
+**故事檔案格式：**
+
+```json
+[
+  {
+    "id": 1,
+    "title": "章節標題",
+    "content": "章節內容...\n\n[[IF condition]]\n條件內容\n[[ENDIF]]",
+    "options": [
+      {
+        "text": "選項文字",
+        "next_id": 2
+      }
+    ]
+  }
+]
+```
+
+**詳細使用指南：** 請參考 [STORY_MANAGEMENT.md](STORY_MANAGEMENT.md)
+
 ## 🚀 快速開始
 
 ### 前置需求
@@ -233,32 +293,50 @@ DEBUG=False
 
 ## 📖 故事內容
 
-### 預設故事：「詛咒公主」
+### 範例故事：「森林冒險」
 
-專案包含一個完整的範例故事，改編自經典的奇幻冒險劇情：
+本專案提供一個簡單的範例故事（`example_simple_story.json`）：
 
-- **7 個章節**：包含開端、分支和 4 個不同結局
-- **多重結局**：魔法解咒、政治勒索、人性和解、黑暗終結
-- **條件內容**：根據玩家行動顯示不同內容
-- **分支劇情**：玩家選擇影響故事走向
+- **7 個章節**：森林探險主題
+- **4 個結局**：勇敢面對、明智撤退、準備充分、謹慎選擇
+- **條件內容**：根據是否擁有武器顯示不同內容
+- **分支設計**：展示基本的故事分支邏輯
 
 ### 故事結構
 
 ```
-第1章：故事開端
-├── 第2章：找人聊聊
-│   ├── 第4章：研究詛咒（結局一）
-│   └── 第5章：找到證據（結局二）
-└── 第3章：探索王宮
-    ├── 第6章：冷靜說服（結局三）
-    └── 第7章：武力威脅（結局四）
+第1章：森林入口
+├── 第2章：森林深處
+│   ├── 第4章：遭遇野獸（結局一）
+│   └── 第5章：逃跑（結局二）
+└── 第3章：發現線索
+├── 第6章：有備而來（結局三）
+└── 第7章：安全第一（結局四）
 ```
 
-### 新增故事內容
+### 管理故事內容
 
-1. **編輯 seed_data.py**：新增章節資料
-2. **重新匯入資料**：執行 `python seed_data.py`
-3. **測試新章節**：使用 API 或測試腳本驗證
+1. **使用現有故事**：
+
+   ```bash
+   python seed_data.py --import example_simple_story.json  # 載入範例故事
+   ```
+
+2. **使用自編故事**：
+
+   ```bash
+   python seed_data.py --export my_story.json   # 匯出模板
+   # 編輯 my_story.json
+   python story_validator.py my_story.json      # 驗證故事
+   python seed_data.py --import my_story.json   # 匯入新故事
+   ```
+
+3. **管理和轉換**：
+   ```bash
+   python seed_data.py --list                   # 查看所有章節
+   python story_converter.py story.json --stats # 查看統計
+   python story_converter.py story.json --flowchart story.mmd  # 生成流程圖
+   ```
 
 ## 🧪 測試
 
@@ -289,20 +367,36 @@ http://localhost:8000/docs
 
 ```
 project/
-├── main.py                    # FastAPI 主程式
-├── models.py                  # 定義資料庫模型的 SQLAlchemy 程式碼
-├── schemas.py                 # 定義 API 請求與回應的 Pydantic 資料結構
-├── seed_data.py               # 初始化資料庫的種子資料腳本
-├── test_api.py                # 測試 API 功能的腳本
-├── test_db_connection.py     # 測試資料庫連線的腳本
-├── requirements.txt           # Python 套件需求清單
-├── Procfile                   # Render 平台的部署配置檔案
-├── .env.example               # 環境變數設定範例檔案
-├── gpt_tools_definition.json  # 定義 GPT 工具的 JSON 檔案
-├── README.md                  # 專案的主要說明文件
-├── DEPLOYMENT.md              # 部署指南文件
-├── LOCAL_DEVELOPMENT.md      # 本地開發環境設定指南
-└── GPT_INTEGRATION.md         # GPT 整合指南文件
+├── 📋 核心程式檔案
+│   ├── main.py                    # FastAPI 主程式
+│   ├── models.py                  # 定義資料庫模型的 SQLAlchemy 程式碼
+│   └── schemas.py                 # 定義 API 請求與回應的 Pydantic 資料結構
+│
+├── 🛠️ 故事管理工具
+│   ├── seed_data.py               # 故事資料管理工具（匯入/匯出/清除/列表）
+│   ├── story_validator.py         # 故事檔案驗證工具，檢查完整性和邏輯
+│   ├── story_converter.py         # 格式轉換工具，支援 CSV、Markdown、流程圖輸出
+│   └── example_simple_story.json  # 包含分支劇情和條件內容的範例故事
+│
+├── 🧪 測試檔案
+│   ├── test_api.py                # 測試 API 功能的腳本
+│   └── test_db_connection.py      # 測試資料庫連線的腳本
+│
+├── ⚙️ 配置檔案
+│   ├── requirements.txt           # Python 套件需求清單
+│   ├── Procfile                   # Render 平台的部署配置檔案
+│   └── .env.example               # 環境變數設定範例檔案
+│
+├── 🤖 GPT 整合檔案
+│   ├── gpt_tools_definition.json  # 定義 GPT 工具的 JSON 檔案
+│   └── GPT_INTEGRATION.md         # GPT 整合指南文件
+│
+└── 📚 文件檔案
+    ├── README.md                  # 專案的主要說明文件
+    ├── DEPLOYMENT.md              # 部署指南文件
+    ├── LOCAL_DEVELOPMENT.md       # 本地開發環境設定指南
+    ├── STORY_MANAGEMENT.md        # 故事管理完整指南
+    └── LICENSE                    # MIT 開源授權條款
 ```
 
 ## 🔧 技術規格

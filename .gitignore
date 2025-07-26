@@ -145,12 +145,13 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-story_data.json
 *.db
 *.sqlite
 PROJECT_SUMMARY.md
 
 # Example story file
 example_story.txt
+story.mmd
+story_data.json
 # This file is used to demonstrate the story engine API and should not be tracked in version control
 # It can be generated or modified during development, so it is excluded from version control

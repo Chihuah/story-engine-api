@@ -117,7 +117,7 @@ DATABASE_URL = postgresql://username:password@hostname:5432/database_name
 部署完成後，需要匯入種子資料：
 
 ```bash
-# 方法一：使用 Render Shell（推薦）
+# 方法一：使用 Render Shell（推薦，但需要付費）
 # 在 Web Service 頁面中，點擊 "Shell" 標籤
 # 執行以下命令：
 python seed_data.py

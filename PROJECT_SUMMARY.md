@@ -64,18 +64,25 @@
 9. **test_api.py** - API 功能測試腳本
 10. **test_db_connection.py** - 資料庫連線測試腳本
 
+### 故事管理工具
+
+11. **story_validator.py** - 故事檔案驗證工具
+12. **story_converter.py** - 故事格式轉換工具
+13. **example_simple_story.json** - 簡單故事範例檔案
+
 ### GPT 整合檔案
 
-11. **gpt_tools_definition.json** - GPT Function Calling 工具定義
-12. **GPT_INTEGRATION.md** - GPT 整合詳細指南
+14. **gpt_tools_definition.json** - GPT Function Calling 工具定義
+15. **GPT_INTEGRATION.md** - GPT 整合詳細指南
 
 ### 文件檔案
 
-13. **README.md** - 專案主要說明文件（已更新本地開發說明）
-14. **DEPLOYMENT.md** - 雲端部署詳細指南
-15. **LOCAL_DEVELOPMENT.md** - 本地開發環境故障排除指南（新增）
-16. **LICENSE** - MIT 開源授權條款
-17. **PROJECT_SUMMARY.md** - 專案交付總結（本檔案）
+16. **README.md** - 專案主要說明文件（已更新本地開發說明）
+17. **DEPLOYMENT.md** - 雲端部署詳細指南
+18. **LOCAL_DEVELOPMENT.md** - 本地開發環境故障排除指南（新增）
+19. **STORY_MANAGEMENT.md** - 故事管理完整指南（新增）
+20. **LICENSE** - MIT 開源授權條款
+21. **PROJECT_SUMMARY.md** - 專案交付總結（本檔案）
 
 ## 🔧 本地開發環境修復
 
@@ -108,6 +115,73 @@
 - ✅ **schemas.py** - 更新為 Pydantic 1.10.13 相容語法
 - ✅ **README.md** - 加入本地開發注意事項
 - ✅ **.env.example** - 加入 SQLite 選項和安裝說明
+
+## 🆕 故事管理系統增強
+
+### 新增的故事管理功能
+
+#### 1. 增強版 seed_data.py
+
+- **雙向操作**：既能匯出也能匯入故事資料
+- **命令列介面**：支援多種操作模式
+- **資料驗證**：匯入時自動檢查資料格式
+- **更新機制**：支援更新現有章節或新增章節
+
+#### 2. story_validator.py - 故事驗證工具
+
+- **結構驗證**：檢查必要欄位和資料類型
+- **引用檢查**：確保所有章節引用都存在
+- **邏輯分析**：檢查起始章節、結局章節、孤立章節
+- **條件語法**：驗證 IF/ENDIF 語法正確性
+- **品質檢查**：內容長度、選項數量等品質指標
+
+#### 3. story_converter.py - 格式轉換工具
+
+- **多格式輸出**：CSV、Markdown、Mermaid 流程圖
+- **統計分析**：詳細的故事統計資訊
+- **視覺化支援**：生成流程圖幫助理解故事結構
+
+#### 4. 範例和模板
+
+- **example_simple_story.json**：簡單的故事範例
+- **完整文件**：STORY_MANAGEMENT.md 詳細使用指南
+
+### 使用場景
+
+1. **故事開發**：
+
+   ```bash
+   # 建立新故事
+   python seed_data.py --export my_story.json
+   # 編輯 my_story.json
+   python story_validator.py my_story.json
+   python seed_data.py --import my_story.json
+   ```
+
+2. **故事維護**：
+
+   ```bash
+   # 備份現有故事
+   python seed_data.py --export-db backup.json
+   # 查看故事統計
+   python story_converter.py backup.json --stats
+   ```
+
+3. **故事分享**：
+   ```bash
+   # 生成可讀文件
+   python story_converter.py story.json --markdown story.md
+   # 生成流程圖
+   python story_converter.py story.json --flowchart story.mmd
+   ```
+
+### 解決的問題
+
+✅ **JSON 檔案用途**：現在 JSON 檔案可以雙向使用，不只是備份
+✅ **故事驗證**：確保故事檔案的完整性和邏輯正確性
+✅ **格式轉換**：支援多種格式，方便分享和文件化
+✅ **開發工作流程**：完整的故事開發、測試、部署流程
+✅ **視覺化支援**：流程圖幫助理解複雜的故事結構
 
 ## 🎯 核心功能特色
 
