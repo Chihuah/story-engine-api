@@ -133,7 +133,13 @@ GPTs 自訂模型 ──┐
 
    ```bash
    pip install -r requirements.txt
+
+   # 單獨安裝 psycopg2-binary（避免編譯問題）
+   pip install --only-binary=:all: psycopg2-binary==2.9.10
    ```
+
+   > **注意**：如果您遇到 Pydantic 安裝問題（需要 Rust），requirements.txt 已使用相容版本 1.10.13。
+   > 如果您遇到 psycopg2-binary 編譯問題，請使用上述的 `--only-binary` 參數安裝。
 
 4. **設定環境變數**
 
@@ -151,7 +157,7 @@ GPTs 自訂模型 ──┐
 6. **啟動開發伺服器**
 
    ```bash
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   uvicorn main:app --reload --host 127.0.0.1 --port 8000
    ```
 
 7. **測試 API**

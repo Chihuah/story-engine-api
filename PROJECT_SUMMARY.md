@@ -49,31 +49,65 @@
 
 1. **main.py** - FastAPI 主程式，包含兩個核心 API 端點
 2. **models.py** - SQLAlchemy 資料庫模型定義
-3. **schemas.py** - Pydantic 資料結構定義
+3. **schemas.py** - Pydantic 資料結構定義（已更新為 Pydantic 1.10.13 相容）
 4. **seed_data.py** - 資料庫種子資料匯入腳本
 
 ### 配置檔案
 
-5. **requirements.txt** - Python 套件依賴清單
+5. **requirements.txt** - Python 套件依賴清單（已修復相容性問題）
 6. **Procfile** - Render 部署配置檔案
-7. **.env.example** - 環境變數範本檔案
+7. **.env.example** - 環境變數範本檔案（已加入 SQLite 選項）
 8. **.gitignore** - Git 版本控制忽略檔案
 
 ### 測試檔案
 
 9. **test_api.py** - API 功能測試腳本
+10. **test_db_connection.py** - 資料庫連線測試腳本
 
 ### GPT 整合檔案
 
-10. **gpt_tools_definition.json** - GPT Function Calling 工具定義
-11. **GPT_INTEGRATION.md** - GPT 整合詳細指南
+11. **gpt_tools_definition.json** - GPT Function Calling 工具定義
+12. **GPT_INTEGRATION.md** - GPT 整合詳細指南
 
 ### 文件檔案
 
-12. **README.md** - 專案主要說明文件
-13. **DEPLOYMENT.md** - 雲端部署詳細指南
-14. **LICENSE** - MIT 開源授權條款
-15. **PROJECT_SUMMARY.md** - 專案交付總結（本檔案）
+13. **README.md** - 專案主要說明文件（已更新本地開發說明）
+14. **DEPLOYMENT.md** - 雲端部署詳細指南
+15. **LOCAL_DEVELOPMENT.md** - 本地開發環境故障排除指南（新增）
+16. **LICENSE** - MIT 開源授權條款
+17. **PROJECT_SUMMARY.md** - 專案交付總結（本檔案）
+
+## 🔧 本地開發環境修復
+
+### 已解決的相容性問題
+
+#### 問題 1：Pydantic 2.x 需要 Rust 編譯器
+
+- **原因**：Pydantic 2.5.0 需要 Rust 來編譯某些組件
+- **解決方案**：降級到 Pydantic 1.10.13
+- **影響**：更新了 schemas.py 中的 Field 定義語法
+- **狀態**：✅ 已修復
+
+#### 問題 2：psycopg2-binary 編譯問題
+
+- **原因**：缺少 pg_config 或 Visual C++ 編譯工具
+- **解決方案**：從 requirements.txt 移除，改用單獨安裝命令
+- **安裝命令**：`pip install --only-binary=:all: psycopg2-binary==2.9.10`
+- **狀態**：✅ 已修復
+
+### 新增的開發工具
+
+1. **LOCAL_DEVELOPMENT.md** - 詳細的本地開發故障排除指南
+2. **test_db_connection.py** - 資料庫連線測試工具
+3. **SQLite 支援** - 快速測試的替代資料庫選項
+4. **Docker 配置範例** - 避免本地環境問題的容器化方案
+
+### 更新的檔案
+
+- ✅ **requirements.txt** - 移除 psycopg2-binary，降級 Pydantic
+- ✅ **schemas.py** - 更新為 Pydantic 1.10.13 相容語法
+- ✅ **README.md** - 加入本地開發注意事項
+- ✅ **.env.example** - 加入 SQLite 選項和安裝說明
 
 ## 🎯 核心功能特色
 

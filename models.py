@@ -9,15 +9,23 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import os
 
-# 資料庫連線設定
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL", 
-    "postgresql://user:password@localhost/storyengine"
-)
+from dotenv import load_dotenv, find_dotenv
 
-# 處理 Render PostgreSQL URL 格式
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+"""顯示環境資訊"""
+# 嘗試載入 .env 檔案
+dotenv_path = find_dotenv()
+if dotenv_path:
+    print(f"載入的 .env 檔案路徑: {dotenv_path}")
+    load_dotenv(dotenv_path, override=True)
+else:
+    print("未找到 .env 檔案")
+
+# 資料庫連線設定
+DATABASE_URL = os.environ.get('DATABASE_URL')
+print(f"   DATABASE_URL: {os.environ.get('DATABASE_URL', '未設定')}")
+# # 處理 Render PostgreSQL URL 格式
+# if DATABASE_URL.startswith("postgres://"):
+#     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # 建立資料庫引擎
 engine = create_engine(DATABASE_URL)
@@ -59,6 +67,8 @@ class Chapter(Base):
 # 建立所有資料表的函數
 def create_tables():
     """建立所有資料表"""
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    engine = create_engine(DATABASE_URL)
     Base.metadata.create_all(bind=engine)
     print("資料表建立完成")
 

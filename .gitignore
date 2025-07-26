@@ -148,6 +148,7 @@ Thumbs.db
 story_data.json
 *.db
 *.sqlite
+PROJECT_SUMMARY.md
 
 # Example story file
 example_story.txt
