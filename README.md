@@ -429,6 +429,8 @@ project/
     ├── DEPLOYMENT.md              # 部署指南文件
     ├── LOCAL_DEVELOPMENT.md       # 本地開發環境設定指南
     ├── STORY_MANAGEMENT.md        # 故事管理完整指南
+    ├── AI_STORY_CREATION_GUIDE.md # AI創作故事之生成指引
+    ├── privacy-policy.html        # 隱私權政策宣達網頁
     └── LICENSE                    # MIT 開源授權條款
 ```
 
