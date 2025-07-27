@@ -353,8 +353,7 @@ story-engine-api/
 │   ├── story_validator.py         # 故事檔案驗證工具
 │   ├── story_converter.py         # 故事格式轉換工具
 │   ├── migration_to_multi_table.py # 資料庫遷移腳本
-│   ├── example_simple_story.json  # 簡單故事範例檔案
-│   └── example_enhanced_story.json # 稍加完整的故事範例檔案
+│   └── example_story.json         # 互動式故事範例檔案
 │
 ├── 🧪 測試檔案
 │   ├── test_api.py                # 測試 API 功能的腳本

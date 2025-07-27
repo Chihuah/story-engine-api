@@ -6,8 +6,7 @@ SQLAlchemy
 """
 
 from sqlalchemy import create_engine, Column, Integer, String, Text, JSON, DateTime, MetaData, Table
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.sql import func
 from typing import Dict, List, Optional
 from datetime import datetime
@@ -152,20 +151,6 @@ def get_db():
         yield db
     finally:
         db.close()
-    
-    def __repr__(self):
-        return f"<Chapter(id={self.id}, title='{self.title[:20]}...')>"
-    
-    def to_dict(self):
-        """轉換為字典格式"""
-        return {
-            "id": self.id,
-            "title": self.title,
-            "content": self.content,
-            "options": self.options,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None
-        }
 
 # 建立所有資料表的函數
 def create_tables():
@@ -174,16 +159,6 @@ def create_tables():
     engine = create_engine(DATABASE_URL)
     Base.metadata.create_all(bind=engine)
     print("資料表建立完成")
-
-# 取得資料庫 Session 的函數
-def get_database_session():
-    """取得資料庫 Session"""
-    db = SessionLocal()
-    try:
-        return db
-    except Exception as e:
-        db.close()
-        raise e
 
 if __name__ == "__main__":
     # 直接執行此檔案時建立資料表

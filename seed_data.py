@@ -401,11 +401,17 @@ def export_story_to_json(story_id: str, output_file: str = None) -> bool:
             }
             
             for chapter in chapters:
+                # 檢查 options 的類型，如果已經是 list/dict 就直接使用，否則解析 JSON
+                if isinstance(chapter.options, str):
+                    options = json.loads(chapter.options) if chapter.options else []
+                else:
+                    options = chapter.options if chapter.options else []
+                
                 chapter_data = {
                     "id": chapter.id,
                     "title": chapter.title,
                     "content": chapter.content,
-                    "options": json.loads(chapter.options) if chapter.options else []
+                    "options": options
                 }
                 export_data["chapters"].append(chapter_data)
             
@@ -463,11 +469,17 @@ def export_all_stories_to_json(output_file: str = None) -> bool:
                 }
                 
                 for chapter in chapters:
+                    # 檢查 options 的類型，如果已經是 list/dict 就直接使用，否則解析 JSON
+                    if isinstance(chapter.options, str):
+                        options = json.loads(chapter.options) if chapter.options else []
+                    else:
+                        options = chapter.options if chapter.options else []
+                    
                     chapter_data = {
                         "id": chapter.id,
                         "title": chapter.title,
                         "content": chapter.content,
-                        "options": json.loads(chapter.options) if chapter.options else []
+                        "options": options
                     }
                     story_data["chapters"].append(chapter_data)
                 
@@ -547,7 +559,12 @@ def list_chapters(story_id: str):
             print("-" * 80)
             
             for chapter in chapters:
-                options = json.loads(chapter.options) if chapter.options else []
+                # 檢查 options 的類型，如果已經是 list/dict 就直接使用，否則解析 JSON
+                if isinstance(chapter.options, str):
+                    options = json.loads(chapter.options) if chapter.options else []
+                else:
+                    options = chapter.options if chapter.options else []
+                
                 print(f"第 {chapter.id} 章: {chapter.title}")
                 print(f"   內容長度: {len(chapter.content)} 字元")
                 print(f"   選項數量: {len(options)}")

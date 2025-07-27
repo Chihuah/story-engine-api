@@ -222,7 +222,12 @@ async def get_story_chapters(story_id: str, db: Session = Depends(get_db)):
         
         chapter_list = []
         for chapter in chapters:
-            options = json.loads(chapter.options) if chapter.options else []
+            # 檢查 options 的類型，如果已經是 list/dict 就直接使用，否則解析 JSON
+            if isinstance(chapter.options, str):
+                options = json.loads(chapter.options) if chapter.options else []
+            else:
+                options = chapter.options if chapter.options else []
+                
             chapter_info = ChapterInfo(
                 id=chapter.id,
                 title=chapter.title,
@@ -276,8 +281,11 @@ async def get_story_chapter(
         # 處理條件內容
         processed_content = process_conditional_content(chapter.content, request.game_state)
         
-        # 解析選項
-        options = json.loads(chapter.options) if chapter.options else []
+        # 解析選項 - 檢查類型後決定是否需要解析 JSON
+        if isinstance(chapter.options, str):
+            options = json.loads(chapter.options) if chapter.options else []
+        else:
+            options = chapter.options if chapter.options else []
         
         return StoryEngineResponse(
             story_id=story_id,
@@ -415,7 +423,12 @@ async def export_story(story_id: str, db: Session = Depends(get_db)):
         
         chapter_list = []
         for chapter in chapters:
-            options = json.loads(chapter.options) if chapter.options else []
+            # 檢查 options 的類型，如果已經是 list/dict 就直接使用，否則解析 JSON
+            if isinstance(chapter.options, str):
+                options = json.loads(chapter.options) if chapter.options else []
+            else:
+                options = chapter.options if chapter.options else []
+                
             chapter_data = {
                 "id": chapter.id,
                 "title": chapter.title,

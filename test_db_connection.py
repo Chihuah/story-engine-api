@@ -7,17 +7,26 @@
 
 import os
 import sys
-import asyncio
+import json
 from sqlalchemy import create_engine, text, inspect
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from models import Base, StoryRegistry, get_story_table_class
-from main import get_database_url
+from models import Base, StoryRegistry, create_story_table_in_db, get_story_table
 import logging
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def get_database_url():
+    """取得資料庫連線 URL"""
+    from dotenv import load_dotenv, find_dotenv
+    
+    # 載入環境變數
+    dotenv_path = find_dotenv()
+    if dotenv_path:
+        load_dotenv(dotenv_path, override=True)
+    
+    return os.environ.get('DATABASE_URL')
 
 class DatabaseTester:
     """資料庫測試類別"""
@@ -25,7 +34,6 @@ class DatabaseTester:
     def __init__(self):
         self.database_url = get_database_url()
         self.engine = None
-        self.async_engine = None
         self.session = None
         
     def setup_engines(self):
@@ -36,11 +44,6 @@ class DatabaseTester:
                 self.engine = create_engine(self.database_url, echo=False)
             else:
                 self.engine = create_engine(self.database_url, echo=False, pool_pre_ping=True)
-            
-            # 異步引擎（如果需要）
-            async_url = self.database_url.replace('postgresql://', 'postgresql+asyncpg://')
-            if not async_url.startswith('sqlite'):
-                self.async_engine = create_async_engine(async_url, echo=False)
             
             logger.info("✅ 資料庫引擎設定成功")
             return True
@@ -84,7 +87,7 @@ class DatabaseTester:
                 
                 logger.info(f"📊 資料庫類型: {db_type}")
                 logger.info(f"📊 資料庫版本: {version}")
-                logger.info(f"📊 連線 URL: {self.database_url.split('@')[0]}@***")
+                logger.info(f"📊 連線 URL: {self.database_url.split('@')[0] if '@' in self.database_url else self.database_url}")
                 
                 return True
                 
@@ -173,48 +176,73 @@ class DatabaseTester:
         """測試動態故事表創建"""
         try:
             # 創建測試故事表
-            story_table_class = get_story_table_class("test_story")
-            story_table_class.__table__.create(bind=self.engine, checkfirst=True)
+            story_table = create_story_table_in_db("test_story")
             logger.info("✅ 動態故事表創建成功")
             
             # 測試插入資料
             Session = sessionmaker(bind=self.engine)
             session = Session()
             
-            test_chapter = story_table_class(
-                id=1,
-                title="測試章節",
-                content="這是一個測試章節的內容",
-                options=[
-                    {
-                        "text": "選項一",
-                        "next_chapter": 2,
-                        "condition": None,
-                        "game_state": {"test_var": True}
-                    }
-                ]
-            )
+            # 先清理可能存在的測試資料
+            try:
+                delete_sql = text("DELETE FROM story_test_story WHERE id = :id")
+                session.execute(delete_sql, {'id': 1})
+                session.commit()
+            except Exception:
+                # 如果表不存在或沒有資料，忽略錯誤
+                session.rollback()
             
-            session.add(test_chapter)
+            # 使用原始 SQL 插入資料
+            test_options = [
+                {
+                    "text": "選項一",
+                    "next_id": 2,
+                    "game_state": {"test_var": True}
+                }
+            ]
+            
+            insert_sql = text("""
+                INSERT INTO story_test_story (id, title, content, options)
+                VALUES (:id, :title, :content, :options)
+            """)
+            
+            session.execute(insert_sql, {
+                'id': 1,
+                'title': '測試章節',
+                'content': '這是一個測試章節的內容',
+                'options': json.dumps(test_options)
+            })
             session.commit()
             logger.info("✅ 故事章節資料插入成功")
             
             # 測試查詢
-            retrieved = session.query(story_table_class).filter_by(id=1).first()
-            if retrieved and retrieved.title == "測試章節":
+            select_sql = text("SELECT * FROM story_test_story WHERE id = :id")
+            result = session.execute(select_sql, {'id': 1})
+            row = result.fetchone()
+            
+            if row and row.title == "測試章節":
                 logger.info("✅ 故事章節資料查詢成功")
-                logger.info(f"📊 章節選項: {retrieved.options}")
+                # 檢查 options 的類型，如果已經是 list 就直接使用，否則解析 JSON
+                if isinstance(row.options, str):
+                    options = json.loads(row.options) if row.options else []
+                else:
+                    options = row.options if row.options else []
+                logger.info(f"📊 章節選項: {options}")
             else:
                 logger.error("❌ 故事章節資料查詢失敗")
                 return False
             
             # 清除測試資料
-            session.delete(retrieved)
+            delete_sql = text("DELETE FROM story_test_story WHERE id = :id")
+            session.execute(delete_sql, {'id': 1})
             session.commit()
             session.close()
             
             # 刪除測試表
-            story_table_class.__table__.drop(bind=self.engine, checkfirst=True)
+            drop_sql = text("DROP TABLE IF EXISTS story_test_story")
+            with self.engine.connect() as conn:
+                conn.execute(drop_sql)
+                conn.commit()
             logger.info("🧹 測試故事表清除完成")
             
             return True
@@ -227,8 +255,7 @@ class DatabaseTester:
         """測試 JSON 欄位操作"""
         try:
             # 創建測試故事表
-            story_table_class = get_story_table_class("json_test")
-            story_table_class.__table__.create(bind=self.engine, checkfirst=True)
+            story_table = create_story_table_in_db("json_test")
             
             Session = sessionmaker(bind=self.engine)
             session = Session()
@@ -237,7 +264,7 @@ class DatabaseTester:
             complex_options = [
                 {
                     "text": "使用魔法攻擊",
-                    "next_chapter": 10,
+                    "next_id": 10,
                     "condition": "magic_power >= 50 AND has_staff",
                     "game_state": {
                         "magic_power": -20,
@@ -248,7 +275,7 @@ class DatabaseTester:
                 },
                 {
                     "text": "物理攻擊",
-                    "next_chapter": 11,
+                    "next_id": 11,
                     "condition": "strength > 15",
                     "game_state": {
                         "stamina": -10,
@@ -257,21 +284,41 @@ class DatabaseTester:
                 }
             ]
             
-            test_chapter = story_table_class(
-                id=1,
-                title="戰鬥章節",
-                content="你面對著強大的敵人，[[IF has_staff]]你的法杖閃閃發光[[ENDIF]]。",
-                options=complex_options
-            )
+            # 先清理可能存在的測試資料
+            try:
+                delete_sql = text("DELETE FROM story_json_test WHERE id = :id")
+                session.execute(delete_sql, {'id': 1})
+                session.commit()
+            except Exception:
+                # 如果表不存在或沒有資料，忽略錯誤
+                session.rollback()
             
-            session.add(test_chapter)
+            insert_sql = text("""
+                INSERT INTO story_json_test (id, title, content, options)
+                VALUES (:id, :title, :content, :options)
+            """)
+            
+            session.execute(insert_sql, {
+                'id': 1,
+                'title': '戰鬥章節',
+                'content': '你面對著強大的敵人，[[IF has_staff]]你的法杖閃閃發光[[ENDIF]]。',
+                'options': json.dumps(complex_options)
+            })
             session.commit()
             logger.info("✅ 複雜 JSON 資料插入成功")
             
             # 查詢並驗證 JSON 資料
-            retrieved = session.query(story_table_class).filter_by(id=1).first()
-            if retrieved:
-                options = retrieved.options
+            select_sql = text("SELECT * FROM story_json_test WHERE id = :id")
+            result = session.execute(select_sql, {'id': 1})
+            row = result.fetchone()
+            
+            if row:
+                # 檢查 options 的類型，如果已經是 list 就直接使用，否則解析 JSON
+                if isinstance(row.options, str):
+                    options = json.loads(row.options) if row.options else []
+                else:
+                    options = row.options if row.options else []
+                    
                 if len(options) == 2 and options[0]["text"] == "使用魔法攻擊":
                     logger.info("✅ JSON 資料查詢和解析成功")
                     logger.info(f"📊 第一個選項條件: {options[0]['condition']}")
@@ -284,12 +331,16 @@ class DatabaseTester:
                 return False
             
             # 清除測試資料
-            session.delete(retrieved)
+            delete_sql = text("DELETE FROM story_json_test WHERE id = :id")
+            session.execute(delete_sql, {'id': 1})
             session.commit()
             session.close()
             
             # 刪除測試表
-            story_table_class.__table__.drop(bind=self.engine, checkfirst=True)
+            drop_sql = text("DROP TABLE IF EXISTS story_json_test")
+            with self.engine.connect() as conn:
+                conn.execute(drop_sql)
+                conn.commit()
             logger.info("🧹 JSON 測試表清除完成")
             
             return True

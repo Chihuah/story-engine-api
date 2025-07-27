@@ -43,8 +43,7 @@ class StoryEngineAPITester:
         try:
             response = self.session.get(f"{self.base_url}/")
             if response.status_code == 200:
-                data = response.json()
-                self.log_test_result("伺服器健康檢查", True, f"狀態: {data.get('status', 'unknown')}")
+                self.log_test_result("伺服器健康檢查", True, "服務正常運行")
                 return True
             else:
                 self.log_test_result("伺服器健康檢查", False, f"HTTP {response.status_code}")
@@ -97,17 +96,18 @@ class StoryEngineAPITester:
         try:
             response = self.session.get(f"{self.base_url}/api/stories")
             if response.status_code == 200:
-                stories = response.json()
-                story_count = len(stories)
+                data = response.json()
+                stories = data.get("stories", [])
+                total = data.get("total", 0)
                 
-                if story_count > 0:
+                if total > 0:
                     # 檢查故事資料結構
                     first_story = stories[0]
-                    required_fields = ["story_id", "title", "description", "author"]
+                    required_fields = ["story_id", "title", "description", "author", "table_name"]
                     missing_fields = [field for field in required_fields if field not in first_story]
                     
                     if not missing_fields:
-                        details = f"找到 {story_count} 個故事，資料結構完整"
+                        details = f"找到 {total} 個故事，資料結構完整"
                         self.log_test_result("列出故事", True, details)
                         return True
                     else:
@@ -125,6 +125,95 @@ class StoryEngineAPITester:
             self.log_test_result("列出故事", False, f"錯誤: {e}")
             return False
     
+    def test_get_story_info(self) -> bool:
+        """測試取得特定故事資訊"""
+        try:
+            # 先獲取故事列表
+            stories_response = self.session.get(f"{self.base_url}/api/stories")
+            if stories_response.status_code != 200:
+                self.log_test_result("取得故事資訊", False, "無法獲取故事列表")
+                return False
+            
+            data = stories_response.json()
+            stories = data.get("stories", [])
+            if not stories:
+                self.log_test_result("取得故事資訊", True, "沒有可用的故事")
+                return True
+            
+            # 測試第一個故事
+            test_story_id = stories[0]["story_id"]
+            response = self.session.get(f"{self.base_url}/api/stories/{test_story_id}")
+            
+            if response.status_code == 200:
+                story_info = response.json()
+                required_fields = ["story_id", "title", "description", "author", "table_name"]
+                missing_fields = [field for field in required_fields if field not in story_info]
+                
+                if not missing_fields:
+                    details = f"故事 {test_story_id} 資訊完整"
+                    self.log_test_result("取得故事資訊", True, details)
+                    return True
+                else:
+                    details = f"故事資訊不完整，缺少: {missing_fields}"
+                    self.log_test_result("取得故事資訊", False, details)
+                    return False
+            else:
+                self.log_test_result("取得故事資訊", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test_result("取得故事資訊", False, f"錯誤: {e}")
+            return False
+    
+    def test_get_story_chapters(self) -> bool:
+        """測試取得故事章節列表"""
+        try:
+            # 先獲取故事列表
+            stories_response = self.session.get(f"{self.base_url}/api/stories")
+            if stories_response.status_code != 200:
+                self.log_test_result("取得故事章節", False, "無法獲取故事列表")
+                return False
+            
+            data = stories_response.json()
+            stories = data.get("stories", [])
+            if not stories:
+                self.log_test_result("取得故事章節", True, "沒有可用的故事")
+                return True
+            
+            # 測試第一個故事的章節
+            test_story_id = stories[0]["story_id"]
+            response = self.session.get(f"{self.base_url}/api/stories/{test_story_id}/chapters")
+            
+            if response.status_code == 200:
+                chapters_data = response.json()
+                chapters = chapters_data.get("chapters", [])
+                total = chapters_data.get("total", 0)
+                
+                if total > 0:
+                    # 檢查章節資料結構
+                    first_chapter = chapters[0]
+                    required_fields = ["id", "title", "content", "options"]
+                    missing_fields = [field for field in required_fields if field not in first_chapter]
+                    
+                    if not missing_fields:
+                        details = f"故事 {test_story_id} 有 {total} 個章節，結構完整"
+                        self.log_test_result("取得故事章節", True, details)
+                        return True
+                    else:
+                        details = f"章節結構不完整，缺少: {missing_fields}"
+                        self.log_test_result("取得故事章節", False, details)
+                        return False
+                else:
+                    self.log_test_result("取得故事章節", True, f"故事 {test_story_id} 沒有章節")
+                    return True
+            else:
+                self.log_test_result("取得故事章節", False, f"HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test_result("取得故事章節", False, f"錯誤: {e}")
+            return False
+    
     def test_story_engine_basic(self) -> bool:
         """測試基本故事引擎功能"""
         try:
@@ -134,7 +223,8 @@ class StoryEngineAPITester:
                 self.log_test_result("故事引擎基本測試", False, "無法獲取故事列表")
                 return False
             
-            stories = stories_response.json()
+            data = stories_response.json()
+            stories = data.get("stories", [])
             if not stories:
                 self.log_test_result("故事引擎基本測試", False, "沒有可用的故事")
                 return False
@@ -142,20 +232,21 @@ class StoryEngineAPITester:
             # 使用第一個故事進行測試
             test_story_id = stories[0]["story_id"]
             
-            # 測試獲取第一章
+            # 測試獲取第一章（使用新的 API 端點）
             payload = {
-                "story_id": test_story_id,
-                "chapter_id": 1,
                 "game_state": {}
             }
             
-            response = self.session.post(f"{self.base_url}/api/story_engine", json=payload)
+            response = self.session.post(
+                f"{self.base_url}/api/story_engine/{test_story_id}/1", 
+                json=payload
+            )
             
             if response.status_code == 200:
                 data = response.json()
                 
                 # 檢查回應結構
-                required_fields = ["chapter_id", "title", "content", "options", "game_state"]
+                required_fields = ["story_id", "story_title", "chapter_id", "title", "content", "options"]
                 missing_fields = [field for field in required_fields if field not in data]
                 
                 if not missing_fields:
@@ -191,7 +282,8 @@ class StoryEngineAPITester:
                 self.log_test_result("條件內容測試", False, "無法獲取故事列表")
                 return False
             
-            stories = stories_response.json()
+            data = stories_response.json()
+            stories = data.get("stories", [])
             if not stories:
                 self.log_test_result("條件內容測試", False, "沒有可用的故事")
                 return False
@@ -200,8 +292,6 @@ class StoryEngineAPITester:
             
             # 測試布林條件
             payload_with_state = {
-                "story_id": test_story_id,
-                "chapter_id": 1,
                 "game_state": {
                     "has_weapon": True,
                     "health": 75,
@@ -210,16 +300,20 @@ class StoryEngineAPITester:
                 }
             }
             
-            response_with_state = self.session.post(f"{self.base_url}/api/story_engine", json=payload_with_state)
+            response_with_state = self.session.post(
+                f"{self.base_url}/api/story_engine/{test_story_id}/1", 
+                json=payload_with_state
+            )
             
             # 測試無狀態
             payload_no_state = {
-                "story_id": test_story_id,
-                "chapter_id": 1,
                 "game_state": {}
             }
             
-            response_no_state = self.session.post(f"{self.base_url}/api/story_engine", json=payload_no_state)
+            response_no_state = self.session.post(
+                f"{self.base_url}/api/story_engine/{test_story_id}/1", 
+                json=payload_no_state
+            )
             
             if response_with_state.status_code == 200 and response_no_state.status_code == 200:
                 data_with_state = response_with_state.json()
@@ -257,7 +351,8 @@ class StoryEngineAPITester:
                 self.log_test_result("數值條件測試", False, "無法獲取故事列表")
                 return False
             
-            stories = stories_response.json()
+            data = stories_response.json()
+            stories = data.get("stories", [])
             if not stories:
                 self.log_test_result("數值條件測試", False, "沒有可用的故事")
                 return False
@@ -274,12 +369,14 @@ class StoryEngineAPITester:
             results = []
             for test_case in test_cases:
                 payload = {
-                    "story_id": test_story_id,
-                    "chapter_id": 1,
-                    "game_state": test_case
+                    "game_state": {k: v for k, v in test_case.items() if k != "description"}
                 }
                 
-                response = self.session.post(f"{self.base_url}/api/story_engine", json=payload)
+                response = self.session.post(
+                    f"{self.base_url}/api/story_engine/{test_story_id}/1", 
+                    json=payload
+                )
+                
                 if response.status_code == 200:
                     data = response.json()
                     results.append({
@@ -320,7 +417,7 @@ class StoryEngineAPITester:
                 data = response.json()
                 
                 # 檢查回應結構
-                required_fields = ["dice_count", "dice_sides", "results", "total", "timestamp"]
+                required_fields = ["dice_count", "dice_sides", "results", "total", "description"]
                 missing_fields = [field for field in required_fields if field not in data]
                 
                 if missing_fields:
@@ -400,12 +497,13 @@ class StoryEngineAPITester:
         try:
             # 測試無效的故事 ID
             invalid_story_payload = {
-                "story_id": "nonexistent_story",
-                "chapter_id": 1,
                 "game_state": {}
             }
             
-            response = self.session.post(f"{self.base_url}/api/story_engine", json=invalid_story_payload)
+            response = self.session.post(
+                f"{self.base_url}/api/story_engine/nonexistent_story/1", 
+                json=invalid_story_payload
+            )
             
             if response.status_code == 404:
                 self.log_test_result("無效故事ID錯誤處理", True, "正確回傳 404")
@@ -416,15 +514,17 @@ class StoryEngineAPITester:
             # 測試無效的章節 ID
             stories_response = self.session.get(f"{self.base_url}/api/stories")
             if stories_response.status_code == 200:
-                stories = stories_response.json()
+                data = stories_response.json()
+                stories = data.get("stories", [])
                 if stories:
                     invalid_chapter_payload = {
-                        "story_id": stories[0]["story_id"],
-                        "chapter_id": 99999,
                         "game_state": {}
                     }
                     
-                    response = self.session.post(f"{self.base_url}/api/story_engine", json=invalid_chapter_payload)
+                    response = self.session.post(
+                        f"{self.base_url}/api/story_engine/{stories[0]['story_id']}/99999", 
+                        json=invalid_chapter_payload
+                    )
                     
                     if response.status_code == 404:
                         self.log_test_result("無效章節ID錯誤處理", True, "正確回傳 404")
@@ -452,42 +552,22 @@ class StoryEngineAPITester:
             self.log_test_result("錯誤處理測試", False, f"錯誤: {e}")
             return False
     
-    def test_privacy_policy(self) -> bool:
-        """測試隱私權政策頁面"""
-        try:
-            response = self.session.get(f"{self.base_url}/privacy")
-            
-            if response.status_code == 200:
-                content = response.text
-                
-                # 檢查是否包含關鍵內容
-                key_terms = ["隱私權政策", "資料收集", "資料使用", "聯絡資訊"]
-                found_terms = [term for term in key_terms if term in content]
-                
-                if len(found_terms) >= 3:
-                    self.log_test_result("隱私權政策", True, f"包含 {len(found_terms)} 個關鍵項目")
-                    return True
-                else:
-                    self.log_test_result("隱私權政策", False, f"內容不完整，只找到: {found_terms}")
-                    return False
-            else:
-                self.log_test_result("隱私權政策", False, f"HTTP {response.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log_test_result("隱私權政策測試", False, f"錯誤: {e}")
-            return False
-    
     def test_performance(self) -> bool:
         """測試 API 效能"""
         try:
             # 獲取故事列表
             stories_response = self.session.get(f"{self.base_url}/api/stories")
-            if stories_response.status_code != 200 or not stories_response.json():
+            if stories_response.status_code != 200:
+                self.log_test_result("效能測試", False, "無法獲取故事列表")
+                return False
+            
+            data = stories_response.json()
+            stories = data.get("stories", [])
+            if not stories:
                 self.log_test_result("效能測試", False, "沒有可用的故事")
                 return False
             
-            test_story_id = stories_response.json()[0]["story_id"]
+            test_story_id = stories[0]["story_id"]
             
             # 測試多次請求的平均回應時間
             response_times = []
@@ -495,13 +575,14 @@ class StoryEngineAPITester:
             
             for i in range(test_count):
                 payload = {
-                    "story_id": test_story_id,
-                    "chapter_id": 1,
                     "game_state": {"health": 50 + i * 10}
                 }
                 
                 start_time = time.time()
-                response = self.session.post(f"{self.base_url}/api/story_engine", json=payload)
+                response = self.session.post(
+                    f"{self.base_url}/api/story_engine/{test_story_id}/1", 
+                    json=payload
+                )
                 end_time = time.time()
                 
                 if response.status_code == 200:
@@ -537,12 +618,13 @@ class StoryEngineAPITester:
             ("伺服器健康檢查", self.test_server_health),
             ("API 文件測試", self.test_api_documentation),
             ("列出故事功能", self.test_list_stories),
+            ("取得故事資訊", self.test_get_story_info),
+            ("取得故事章節", self.test_get_story_chapters),
             ("故事引擎基本功能", self.test_story_engine_basic),
             ("條件內容處理", self.test_conditional_content),
             ("數值比較條件", self.test_numeric_conditions),
             ("擲骰功能", self.test_dice_rolling),
             ("錯誤處理", self.test_error_handling),
-            ("隱私權政策", self.test_privacy_policy),
             ("API 效能", self.test_performance)
         ]
         
@@ -593,7 +675,7 @@ class StoryEngineAPITester:
 
 def main():
     """主函數"""
-    print("🔧 Story Engine API Tester v2.0")
+    print("🔧 Story Engine API Tester v1.1")
     print("支援多故事管理和數值比較條件測試")
     print("=" * 50)
     
@@ -631,18 +713,17 @@ def main():
     print(f"\n📄 詳細測試報告已儲存至: {report_filename}")
     
     if success:
-        print("\n🎯 API 測試完成，所有功能正常！")
-        print("💡 建議下一步:")
-        print("1. 在 ChatGPT 中設定 GPT Actions")
-        print("2. 使用 GPT 進行互動式故事測試")
-        print("3. 監控 API 使用情況和效能")
+        print("\n🎯 建議下一步:")
+        print("1. 檢查測試報告了解詳細結果")
+        print("2. 部署到生產環境")
+        print("3. 設定監控和日誌")
         sys.exit(0)
     else:
-        print("\n🔧 發現問題，建議檢查:")
-        print("1. 資料庫連線是否正常")
-        print("2. 故事資料是否已正確載入")
-        print("3. API 服務日誌中的錯誤訊息")
-        print("4. 網路連線和防火牆設定")
+        print("\n🔧 故障排除建議:")
+        print("1. 檢查失敗的測試項目")
+        print("2. 查看 API 服務日誌")
+        print("3. 確認資料庫連線正常")
+        print("4. 檢查環境變數設定")
         sys.exit(1)
 
 if __name__ == "__main__":
