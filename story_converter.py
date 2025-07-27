@@ -48,27 +48,44 @@ class StoryConverter:
                 }
                 
             elif isinstance(self.story_data, dict):
-                # 新格式：包含 story_info 和 chapters
+                # 檢查不同的格式
                 if "story_info" in self.story_data and "chapters" in self.story_data:
-                    self.log("偵測到新格式故事檔案")
+                    # 格式1：包含 story_info 和 chapters
+                    self.log("偵測到新格式故事檔案（story_info 結構）")
                     self.story_info = self.story_data["story_info"]
                     self.chapters = self.story_data["chapters"]
+                elif "story_id" in self.story_data and "chapters" in self.story_data:
+                    # 格式2：seed_data.py 匯出格式（直接包含故事資訊）
+                    self.log("偵測到匯出格式故事檔案")
+                    self.story_info = {
+                        "story_id": self.story_data.get("story_id", "unknown"),
+                        "title": self.story_data.get("title", "未命名故事"),
+                        "description": self.story_data.get("description", ""),
+                        "author": self.story_data.get("author", ""),
+                        "version": self.story_data.get("version", "1.0"),
+                        "created_at": self.story_data.get("exported_at", datetime.now().isoformat())
+                    }
+                    self.chapters = self.story_data["chapters"]
+                elif "id" in self.story_data and "title" in self.story_data:
+                    # 格式3：單一章節格式
+                    self.log("偵測到單章節格式")
+                    self.chapters = [self.story_data]
+                    self.story_info = {
+                        "story_id": "unknown",
+                        "title": "未命名故事",
+                        "description": "",
+                        "author": "",
+                        "version": "1.0",
+                        "created_at": datetime.now().isoformat()
+                    }
                 else:
-                    # 可能是單一故事的舊格式
-                    if "id" in self.story_data and "title" in self.story_data:
-                        self.log("偵測到單章節格式")
-                        self.chapters = [self.story_data]
-                        self.story_info = {
-                            "story_id": "unknown",
-                            "title": "未命名故事",
-                            "description": "",
-                            "author": "",
-                            "version": "1.0",
-                            "created_at": datetime.now().isoformat()
-                        }
-                    else:
-                        print("❌ 無法識別的故事檔案格式")
-                        return False
+                    print("❌ 無法識別的故事檔案格式")
+                    print("🔍 支援的格式：")
+                    print("   1. 章節陣列格式：[{章節1}, {章節2}, ...]")
+                    print("   2. story_info 格式：{\"story_info\": {...}, \"chapters\": [...]}")
+                    print("   3. 匯出格式：{\"story_id\": \"...\", \"title\": \"...\", \"chapters\": [...]}")
+                    print("   4. 單章節格式：{\"id\": 1, \"title\": \"...\", ...}")
+                    return False
             else:
                 print("❌ 故事檔案格式錯誤")
                 return False

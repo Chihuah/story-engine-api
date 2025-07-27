@@ -1,0 +1,107 @@
+{
+  "test_summary": {
+    "total_tests": 16,
+    "passed": 16,
+    "failed": 0,
+    "test_time": 1753632054.146232
+  },
+  "test_results": [
+    {
+      "test": "伺服器健康檢查",
+      "success": true,
+      "details": "服務正常運行",
+      "timestamp": 1753632050.484438
+    },
+    {
+      "test": "OpenAPI 文件",
+      "success": true,
+      "details": "包含 10 個端點, 包含 GPT 優化",
+      "timestamp": 1753632050.6659923
+    },
+    {
+      "test": "Swagger UI",
+      "success": true,
+      "details": "文件頁面可訪問",
+      "timestamp": 1753632050.7654681
+    },
+    {
+      "test": "列出故事",
+      "success": true,
+      "details": "找到 1 個故事，資料結構完整",
+      "timestamp": 1753632050.9551346
+    },
+    {
+      "test": "取得故事資訊",
+      "success": true,
+      "details": "故事 forest_adventure 資訊完整",
+      "timestamp": 1753632051.242613
+    },
+    {
+      "test": "取得故事章節",
+      "success": true,
+      "details": "故事 forest_adventure 有 27 個章節，結構完整",
+      "timestamp": 1753632051.544576
+    },
+    {
+      "test": "故事引擎基本測試",
+      "success": true,
+      "details": "故事 forest_adventure，章節 1，2 個選項",
+      "timestamp": 1753632051.820182
+    },
+    {
+      "test": "條件內容測試",
+      "success": true,
+      "details": "條件內容正確處理不同遊戲狀態",
+      "timestamp": 1753632052.1782625
+    },
+    {
+      "test": "數值條件測試",
+      "success": true,
+      "details": "數值條件正確處理，測試了 3 種情況",
+      "timestamp": 1753632052.6226203
+    },
+    {
+      "test": "擲骰基本測試",
+      "success": true,
+      "details": "1d6 = 2",
+      "timestamp": 1753632052.7998505
+    },
+    {
+      "test": "多骰子測試",
+      "success": true,
+      "details": "3d20 = [9, 17, 7] (總和: 33)",
+      "timestamp": 1753632052.8812068
+    },
+    {
+      "test": "修正值測試",
+      "success": true,
+      "details": "2d6+5 = [5, 2]+5 = 12",
+      "timestamp": 1753632052.9579105
+    },
+    {
+      "test": "無效故事ID錯誤處理",
+      "success": true,
+      "details": "正確回傳 404",
+      "timestamp": 1753632053.1710858
+    },
+    {
+      "test": "無效章節ID錯誤處理",
+      "success": true,
+      "details": "正確回傳 404",
+      "timestamp": 1753632053.3327081
+    },
+    {
+      "test": "無效擲骰參數錯誤處理",
+      "success": true,
+      "details": "正確回傳 422",
+      "timestamp": 1753632053.407884
+    },
+    {
+      "test": "效能測試",
+      "success": true,
+      "details": "平均: 90.1ms, 最大: 94.5ms, 最小: 86.0ms",
+      "timestamp": 1753632054.044723
+    }
+  ],
+  "api_endpoint": "https://story-engine-api.onrender.com"
+}

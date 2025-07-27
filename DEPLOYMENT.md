@@ -120,13 +120,13 @@ python -c "from models import create_tables; create_tables()"
 python seed_data.py
 ```
 
-**方式二：使用遷移腳本**
+**方式二：本地端使用腳本**
 
-如果您有現有的資料需要遷移，可以使用我們提供的遷移腳本：
+於 .env 檔案裡填入 Render PostgreSQL 的 DATABASE_URL
 
 ```bash
-# 執行資料庫遷移
-python migration_to_multi_table.py
+# 連線至伺服器，載入預設故事資料
+python seed_data.py
 ```
 
 ### 第六步：驗證部署

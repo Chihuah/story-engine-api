@@ -320,26 +320,13 @@ python story_converter.py story.json --stats
 🎲 故事複雜度: 複雜 (評分: 156)
 ```
 
-#### 驗證故事完整性
-
-```bash
-python story_converter.py story.json --validate
-```
-
-檢查：
-
-- 章節 ID 連續性
-- 引用完整性
-- 結構完整性
-
 ### 組合使用
 
 ```bash
 # 同時輸出多種格式
 python story_converter.py story.json --csv story.csv --markdown story.md --stats
 
-# 完整分析
-python story_converter.py story.json --stats --validate --flowchart story.mmd
+python story_converter.py story.json --stats --flowchart story.mmd
 ```
 
 ## 工作流程建議
@@ -387,10 +374,7 @@ python seed_data.py --export-story target_story
 # 2. 生成統計報告
 python story_converter.py target_story_exported_*.json --stats
 
-# 3. 驗證完整性
-python story_converter.py target_story_exported_*.json --validate
-
-# 4. 生成視覺化
+# 3. 生成視覺化
 python story_converter.py target_story_exported_*.json --flowchart analysis.mmd
 ```
 

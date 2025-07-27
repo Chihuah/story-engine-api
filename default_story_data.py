@@ -1,0 +1,490 @@
+def create_default_story_data():
+    """建立預設故事章節資料（完整森林冒險 - 修正所有章節引用錯誤）"""
+    
+    chapters_data = [
+        {
+            "id": 1,
+            "title": "森林入口",
+            "content": """你站在一片古老森林的邊緣，高大的樹木遮天蔽日，神秘的霧氣在林間飄蕩。
+
+你是一名經驗豐富的冒險者，當前狀態：
+[[IF health >= 80]]你感覺身體健康，精力充沛。[[ENDIF]]
+[[IF health < 80]]你感覺有些疲憊，需要小心行事。[[ENDIF]]
+[[IF strength >= 15]]你的肌肉結實有力，能夠應對大部分挑戰。[[ENDIF]]
+[[IF wisdom >= 12]]你的頭腦清晰敏銳，善於分析情況。[[ENDIF]]
+
+傳說這片森林中隱藏著古老的寶藏，但也充滿了未知的危險。你背著簡單的行囊，心中既興奮又緊張。
+
+在你面前有兩條小徑：一條看起來較為平坦，另一條則蜿蜒向森林深處。""",
+            "options": [
+                {"text": "走向平坦的小徑", "next_id": 2, "game_state": {"took_risk": False, "played_safe": True}},
+                {"text": "踏上蜿蜒的小徑", "next_id": 3, "game_state": {"took_risk": True, "played_safe": False}}
+            ]
+        },
+        {
+            "id": 2,
+            "title": "森林深處",
+            "content": """你選擇了看似安全的平坦小徑，但很快就發現這條路並不如想像中簡單。
+
+[[IF played_safe]]你謹慎的個性讓你時刻保持警覺。[[ENDIF]]
+[[IF health > 70]]你的良好體力讓你能夠輕鬆應對路上的小障礙。[[ENDIF]]
+[[IF health <= 70]]你感到有些吃力，每一步都需要小心。[[ENDIF]]
+
+前方傳來奇怪的聲音，像是某種大型動物的咆哮。你停下腳步，仔細聆聽。
+
+[[IF has_weapon]]你握緊手中的武器，準備應對可能的危險。[[ENDIF]]
+[[IF NOT has_weapon]]你意識到自己手無寸鐵，心中有些緊張。[[ENDIF]]
+[[IF strength >= 18]]你感覺自己有足夠的力量面對大部分威脅。[[ENDIF]]
+[[IF strength < 18]]你意識到可能需要依靠智慧而非蠻力。[[ENDIF]]""",
+            "options": [
+                {"text": "勇敢地繼續前進", "next_id": 4, "game_state": {"showed_courage": True}},
+                {"text": "小心翼翼地繞道而行", "next_id": 5, "game_state": {"cautious": True}}
+            ]
+        },
+        {
+            "id": 3,
+            "title": "發現線索",
+            "content": """蜿蜒的小徑帶你來到一個小空地，這裡有一口古老的井。
+
+[[IF took_risk]]你的冒險精神得到了回報。[[ENDIF]]
+
+井邊刻著古老的符文，井水清澈見底，散發著淡淡的藍光。在井旁的石頭上，你發現了一把生鏽的短劍和一張破舊的地圖。
+
+[[IF drank_water]]魔法井水的效果讓你感到精神煥發。[[ENDIF]]
+[[IF wisdom >= 15]]你能夠部分理解符文的含義，它們似乎在警告什麼。[[ENDIF]]
+[[IF wisdom < 15]]符文對你來說完全是謎團。[[ENDIF]]""",
+            "options": [
+                {"text": "喝一口井水", "next_id": 6, "game_state": {"drank_water": True, "magic_enhanced": True, "health": 20, "wisdom": 3}},
+                {"text": "拿起短劍和地圖", "next_id": 7, "game_state": {"has_weapon": True, "has_map": True, "strength": 2}},
+                {"text": "仔細研究符文", "next_id": 8, "game_state": {"gained_wisdom": True, "wisdom": 5}}
+            ]
+        },
+        {
+            "id": 4,
+            "title": "遭遇野獸",
+            "content": """你勇敢地繼續前進，很快就遇到了聲音的來源——一隻巨大的森林熊！
+
+[[IF showed_courage]]你的勇氣讓你在面對危險時保持冷靜。[[ENDIF]]
+[[IF has_weapon]]幸好你有武器在手！[[ENDIF]]
+[[IF magic_enhanced]]魔法的力量在你體內流淌，給了你額外的信心。[[ENDIF]]
+[[IF strength >= 20]]你感覺自己有足夠的力量與熊正面對抗。[[ENDIF]]
+[[IF strength < 20]]你意識到正面對抗可能不是明智的選擇。[[ENDIF]]
+
+熊看起來很餓，正在尋找食物。你必須做出選擇。
+
+[[IF health <= 50]]你的體力不足，戰鬥會很危險。[[ENDIF]]
+[[IF wisdom >= 18]]你的智慧讓你想到了幾種不同的應對策略。[[ENDIF]]""",
+            "options": [
+                {"text": "與熊戰鬥（需要力量 ≥ 18）", "next_id": 12, "game_state": {"faced_guardian": True, "health": -25}, "condition": "strength >= 18"},
+                {"text": "嘗試與熊溝通（需要智慧 ≥ 15）", "next_id": 13, "game_state": {"showed_wisdom": True, "wisdom": 3}, "condition": "wisdom >= 15"},
+                {"text": "慢慢後退", "next_id": 14, "game_state": {"cautious": True, "health": -5, "courage": -1}}
+            ]
+        },
+        {
+            "id": 5,
+            "title": "謹慎繞行",
+            "content": """你決定謹慎行事，繞道而行。這個決定讓你避開了危險，但也錯過了一些機會。
+
+[[IF cautious]]你的謹慎個性再次發揮了作用。[[ENDIF]]
+[[IF health < 60]]你的體力不足，繞道是明智的選擇。[[ENDIF]]
+
+在繞道的過程中，你發現了一條隱蔽的小徑，似乎通向森林的另一個區域。
+
+[[IF has_map]]地圖上顯示這條小徑可能通向寶藏所在地。[[ENDIF]]
+[[IF wisdom >= 12]]你的智慧讓你意識到這條小徑可能很重要。[[ENDIF]]""",
+            "options": [
+                {"text": "跟隨隱蔽小徑", "next_id": 15, "game_state": {"found_hidden_path": True}},
+                {"text": "返回主要道路", "next_id": 16, "game_state": {"played_safe": True}}
+            ]
+        },
+        {
+            "id": 6,
+            "title": "魔法增強",
+            "content": """你小心地喝了一口井水，立刻感到一股暖流遍布全身。
+
+[[IF drank_water]]井水的味道甘甜，帶有淡淡的魔法氣息。[[ENDIF]]
+[[IF magic_enhanced]]你感到力量、智慧和敏捷都得到了提升。[[ENDIF]]
+[[IF health >= 90]]你現在感覺前所未有的強壯。[[ENDIF]]
+[[IF wisdom >= 15]]增強的智慧讓你能夠更好地理解周圍的魔法能量。[[ENDIF]]
+
+這口井顯然有著神奇的力量。你現在感覺比以往任何時候都要強大。
+
+在井底，你還看到了一枚閃閃發光的金幣。""",
+            "options": [
+                {"text": "取出金幣", "next_id": 17, "game_state": {"has_gold": True}},
+                {"text": "離開這裡繼續探索", "next_id": 18, "game_state": {"respectful": True, "wisdom": 2}}
+            ]
+        },
+        {
+            "id": 7,
+            "title": "武裝自己",
+            "content": """你拿起了短劍和地圖，感覺更有準備面對未知的挑戰。
+
+[[IF has_weapon]]短劍雖然有些生鏽，但仍然鋒利。[[ENDIF]]
+[[IF has_map]]地圖顯示了森林的部分區域，標記著幾個有趣的地點。[[ENDIF]]
+[[IF strength >= 17]]增強的力量讓你能夠更好地使用這把劍。[[ENDIF]]
+
+地圖上標記著一個神秘的洞穴，似乎就在附近。你決定前往探索。
+
+[[IF wisdom >= 10]]你的智慧讓你意識到這個洞穴可能隱藏著重要的秘密。[[ENDIF]]""",
+            "options": [
+                {"text": "前往神秘洞穴", "next_id": 9, "game_state": {"exploring_cave": True}},
+                {"text": "繼續沿著小徑前進", "next_id": 10, "game_state": {"following_path": True}}
+            ]
+        },
+        {
+            "id": 8,
+            "title": "古老智慧",
+            "content": """你花時間仔細研究井邊的符文，逐漸理解了它們的含義。
+
+[[IF gained_wisdom]]古老的知識在你腦海中閃現。[[ENDIF]]
+[[IF wisdom >= 20]]你現在能夠完全理解符文的警告。[[ENDIF]]
+
+符文警告說，森林深處有一個強大的守護者，只有純潔的心靈才能通過它的考驗。同時，符文也提到了三個試煉：力量、智慧和勇氣。
+
+[[IF wisdom >= 15]]你意識到這些試煉可能是獲得最終寶藏的關鍵。[[ENDIF]]""",
+            "options": [
+                {"text": "尋找力量試煉", "next_id": 9, "game_state": {"seeking_strength": True}},
+                {"text": "尋找智慧試煉", "next_id": 11, "game_state": {"seeking_wisdom": True}}
+            ]
+        },
+        {
+            "id": 9,
+            "title": "洞穴探索",
+            "content": """你來到了一個幽深的洞穴，洞口被藤蔓遮蔽。
+
+[[IF exploring_cave]]地圖指引你來到了這裡。[[ENDIF]]
+[[IF seeking_strength]]符文的指引讓你相信這裡隱藏著力量的試煉。[[ENDIF]]
+[[IF has_weapon]]你握緊武器，準備面對洞穴中的未知。[[ENDIF]]
+
+洞穴深處傳來微弱的光芒，似乎有什麼東西在發光。你小心翼翼地走進洞穴。
+
+[[IF strength >= 15]]你的力量讓你能夠輕鬆推開阻擋的石塊。[[ENDIF]]""",
+            "options": [
+                {"text": "深入洞穴", "next_id": 4, "game_state": {"entered_cave": True}},
+                {"text": "在洞口休息", "next_id": 10, "game_state": {"rested": True, "health": 10}}
+            ]
+        },
+        {
+            "id": 10,
+            "title": "森林小憩",
+            "content": """你決定在這個相對安全的地方休息一下。
+
+[[IF following_path]]繼續前進讓你感到有些疲憊。[[ENDIF]]
+[[IF rested]]短暫的休息讓你恢復了一些體力。[[ENDIF]]
+[[IF health >= 80]]你感覺精神飽滿，準備繼續冒險。[[ENDIF]]
+
+在休息時，你聽到了遠處傳來的美妙歌聲，似乎是某種森林精靈在歌唱。
+
+[[IF wisdom >= 12]]你的智慧讓你意識到這可能是森林精靈的呼喚。[[ENDIF]]""",
+            "options": [
+                {"text": "尋找歌聲來源", "next_id": 11, "game_state": {"following_song": True}},
+                {"text": "繼續原定路線", "next_id": 4, "game_state": {"stayed_course": True}}
+            ]
+        },
+        {
+            "id": 11,
+            "title": "精靈相遇",
+            "content": """你跟隨歌聲來到了一片花海，一位美麗的森林精靈正在這裡歌唱。
+
+[[IF seeking_wisdom]]這正是你尋找的智慧試煉。[[ENDIF]]
+[[IF following_song]]精靈的歌聲引導你來到了這裡。[[ENDIF]]
+[[IF wisdom >= 18]]你能夠理解精靈歌聲中的深層含義。[[ENDIF]]
+
+精靈告訴你，她可以給你一個祝福，但你必須選擇是要力量、智慧還是治癒。
+
+[[IF respectful]]你對自然的尊重讓精靈對你產生好感。[[ENDIF]]""",
+            "options": [
+                {"text": "請求力量祝福", "next_id": 4, "game_state": {"fairy_blessing": "strength", "strength": 8}},
+                {"text": "請求智慧祝福", "next_id": 13, "game_state": {"fairy_blessing": "wisdom", "wisdom": 8}},
+                {"text": "請求治癒祝福", "next_id": 18, "game_state": {"fairy_blessing": "healing", "health": 30}}
+            ]
+        },
+        {
+            "id": 12,
+            "title": "勇敢戰鬥",
+            "content": """你決定與森林熊戰鬥！
+
+[[IF faced_guardian]]戰鬥激烈而危險。[[ENDIF]]
+[[IF strength >= 25]]你的強大力量讓你在戰鬥中佔據上風。[[ENDIF]]
+[[IF health <= 30]]戰鬥讓你受了重傷，你感到頭暈目眩。[[ENDIF]]
+[[IF health <= 0]]你的傷勢過重，意識開始模糊...遊戲結束。[[ENDIF]]
+
+[[IF health > 0]]經過激烈的戰鬥，你終於擊敗了森林熊。在熊的巢穴深處，你發現了一把古老的劍和一瓶治療藥水。
+
+雖然受了傷，但你成功地完成了這次冒險。你的勇氣將被森林中的生物們銘記。[[ENDIF]]""",
+            "options": [
+                {"text": "使用治療藥水（如果生命值 > 0）", "next_id": 19, "game_state": {"used_potion": True, "health": 40, "has_ancient_sword": True}, "condition": "health > 0"},
+                {"text": "保存藥水，拿起古劍（如果生命值 > 0）", "next_id": 20, "game_state": {"saved_potion": True, "has_healing_potion": True, "has_ancient_sword": True, "strength": 5}, "condition": "health > 0"}
+            ]
+        },
+        {
+            "id": 13,
+            "title": "智慧溝通",
+            "content": """你決定用智慧來解決這個問題。
+
+[[IF showed_wisdom]]你的聰明才智派上了用場。[[ENDIF]]
+[[IF wisdom >= 20]]你的高智慧讓你想出了完美的解決方案。[[ENDIF]]
+
+你注意到熊的行為模式，發現它只是在保護自己的幼崽。你慢慢後退，並用手勢表示自己沒有惡意。
+
+熊逐漸放鬆警惕，甚至帶你到了一個隱秘的寶藏室。作為對你智慧的獎勵，熊允許你拿走一件寶物。
+
+[[IF wisdom >= 25]]你的超凡智慧讓熊對你產生了深深的敬意。[[ENDIF]]""",
+            "options": [
+                {"text": "拿取智慧之書", "next_id": 21, "game_state": {"has_wisdom_book": True, "wisdom": 10, "bear_friend": True}},
+                {"text": "拿取力量護符", "next_id": 22, "game_state": {"has_strength_amulet": True, "strength": 8, "bear_friend": True}}
+            ]
+        },
+        {
+            "id": 14,
+            "title": "戰略撤退",
+            "content": """你明智地選擇了撤退，避免了不必要的衝突。
+
+[[IF cautious]]你的謹慎再次救了你一命。[[ENDIF]]
+[[IF health <= 70]]你的體力狀況讓戰鬥變得危險，撤退是正確的選擇。[[ENDIF]]
+
+在撤退的過程中，你發現了熊留下的一些線索，似乎指向森林深處的一個秘密地點。
+
+[[IF has_map]]地圖上的標記與這些線索相符。[[ENDIF]]
+[[IF wisdom >= 15]]你的智慧讓你理解了這些線索的含義。[[ENDIF]]""",
+            "options": [
+                {"text": "跟隨線索", "next_id": 15, "game_state": {"following_clues": True}},
+                {"text": "尋找其他路線", "next_id": 16, "game_state": {"seeking_alternative": True}}
+            ]
+        },
+        {
+            "id": 15,
+            "title": "隱秘小徑",
+            "content": """你跟隨隱蔽的小徑來到了一個神秘的峽谷。
+
+[[IF found_hidden_path]]這條小徑確實通向了一個特殊的地方。[[ENDIF]]
+[[IF following_clues]]熊的線索引導你來到了這裡。[[ENDIF]]
+[[IF has_map]]地圖上標記的秘密地點就是這裡。[[ENDIF]]
+
+峽谷中有一座古老的石橋，橋下是湍急的河流。橋的另一端似乎有一座廢棄的神廟。
+
+[[IF strength >= 20]]你有足夠的力量安全通過這座看起來不太穩固的橋。[[ENDIF]]""",
+            "options": [
+                {"text": "穿越石橋", "next_id": 23, "game_state": {"crossed_bridge": True}},
+                {"text": "尋找其他路線", "next_id": 18, "game_state": {"avoided_bridge": True}}
+            ]
+        },
+        {
+            "id": 16,
+            "title": "主要道路",
+            "content": """你回到了主要道路，繼續你的森林探險。
+
+[[IF played_safe]]你的謹慎個性讓你選擇了更安全的路線。[[ENDIF]]
+[[IF seeking_alternative]]你決定尋找其他的冒險機會。[[ENDIF]]
+
+在主要道路上，你遇到了一位老獵人，他告訴你關於森林深處的傳說。
+
+[[IF wisdom >= 12]]你能夠從老獵人的話中獲得有用的資訊。[[ENDIF]]""",
+            "options": [
+                {"text": "聽取獵人的建議", "next_id": 18, "game_state": {"hunter_advice": True, "wisdom": 3}},
+                {"text": "繼續獨自探索", "next_id": 24, "game_state": {"independent": True}}
+            ]
+        },
+        {
+            "id": 17,
+            "title": "貪婪的代價",
+            "content": """你取出了井底的金幣，但這個行為觸發了井的魔法陷阱。
+
+[[IF has_gold]]金幣在你手中閃閃發光，但你感到一陣不安。[[ENDIF]]
+[[IF magic_enhanced]]你的魔法增強讓你能夠抵抗部分負面效果。[[ENDIF]]
+
+井水開始沸騰，一個憤怒的水靈出現了。它指責你的貪婪，並要求你做出選擇：歸還金幣或接受懲罰。
+
+[[IF wisdom >= 18]]你的智慧讓你意識到這是一個道德考驗。[[ENDIF]]""",
+            "options": [
+                {"text": "歸還金幣並道歉", "next_id": 18, "game_state": {"redeemed": True, "wisdom": 5, "has_gold": False}},
+                {"text": "保留金幣接受懲罰", "next_id": 24, "game_state": {"cursed": True, "health": -20, "has_gold": True}}
+            ]
+        },
+        {
+            "id": 18,
+            "title": "尊重自然",
+            "content": """你選擇尊重這個神聖的地方，沒有取走金幣就離開了。
+
+[[IF respectful]]你對自然的尊重得到了回報。[[ENDIF]]
+[[IF redeemed]]水靈對你的悔改感到滿意。[[ENDIF]]
+[[IF avoided_bridge]]你找到了另一條通往目標的路線。[[ENDIF]]
+[[IF hunter_advice]]老獵人的建議讓你受益匪淺。[[ENDIF]]
+
+當你離開時，井中的水靈給了你一個祝福，你感到內心平靜，智慧增長。
+
+[[IF wisdom >= 20]]增強的智慧讓你能夠感知到森林中隱藏的秘密。[[ENDIF]]""",
+            "options": [
+                {"text": "探索森林深處", "next_id": 23, "game_state": {"blessed": True, "wisdom": 8}},
+                {"text": "返回村莊分享經歷", "next_id": 24, "game_state": {"storyteller": True}}
+            ]
+        },
+        {
+            "id": 19,
+            "title": "恢復活力",
+            "content": """你喝下了治療藥水，感到傷口迅速癒合。
+
+[[IF used_potion]]藥水的效果非常顯著。[[ENDIF]]
+[[IF health >= 60]]你現在感覺好多了，可以繼續冒險。[[ENDIF]]
+[[IF has_ancient_sword]]古劍在你手中散發著神秘的光芒。[[ENDIF]]
+[[IF strength >= 20]]結合你的力量，這把古劍將成為強大的武器。[[ENDIF]]
+
+現在你必須決定下一步的行動。森林深處似乎還有更多的秘密等待發現。
+
+[[IF health >= 80]]你的體力已經完全恢復，感覺比以前更強壯。[[ENDIF]]""",
+            "options": [
+                {"text": "探索森林深處（需要生命值 ≥ 70）", "next_id": 23, "game_state": {"explored_deep": True}, "condition": "health >= 70"},
+                {"text": "返回村莊", "next_id": 24, "game_state": {"returned_home": True}}
+            ]
+        },
+        {
+            "id": 20,
+            "title": "謹慎準備",
+            "content": """你決定保存治療藥水以備不時之需，拿起了古老的劍。
+
+[[IF saved_potion]]治療藥水可能在關鍵時刻救你一命。[[ENDIF]]
+[[IF has_ancient_sword]]古劍的重量讓你感到安心。[[ENDIF]]
+[[IF has_healing_potion]]你現在擁有了強大的武器和治療手段。[[ENDIF]]
+
+古劍上刻著神秘的符文，似乎與你之前見過的井邊符文有某種聯繫。
+
+[[IF strength >= 25]]增強的力量讓你能夠完全發揮古劍的威力。[[ENDIF]]""",
+            "options": [
+                {"text": "研究劍上的符文", "next_id": 23, "game_state": {"studied_runes": True, "wisdom": 5}},
+                {"text": "立即使用治療藥水", "next_id": 19, "game_state": {"used_potion": True, "health": 40, "has_healing_potion": False}}
+            ]
+        },
+        {
+            "id": 21,
+            "title": "智慧的極致",
+            "content": """你選擇了智慧之書，這是一個明智的決定。
+
+[[IF has_wisdom_book]]古老的知識湧入你的腦海。[[ENDIF]]
+[[IF bear_friend]]熊成為了你的朋友和守護者。[[ENDIF]]
+[[IF wisdom >= 30]]你現在擁有了接近聖賢的智慧。[[ENDIF]]
+
+書中記載著古老的魔法和森林的秘密。你學會了與自然溝通的方法，以及一些強大的治療和保護法術。
+
+[[IF wisdom >= 35]]你的智慧已經超越了常人的理解範圍。[[ENDIF]]
+
+你成為了森林的智者，所有的生物都尊敬你。你的智慧將指引未來的冒險者。""",
+            "options": []
+        },
+        {
+            "id": 22,
+            "title": "力量的象徵",
+            "content": """你選擇了力量護符，感受到強大的能量湧入身體。
+
+[[IF has_strength_amulet]]護符散發著溫暖的光芒。[[ENDIF]]
+[[IF bear_friend]]熊對你的選擇表示認同。[[ENDIF]]
+[[IF strength >= 25]]你現在擁有了超人的力量。[[ENDIF]]
+
+護符不僅增強了你的物理力量，還給了你保護森林的責任感。你決定成為森林的守護者。
+
+[[IF strength >= 30]]你的力量足以對抗任何威脅森林的敵人。[[ENDIF]]""",
+            "options": [
+                {"text": "接受守護者的使命", "next_id": 23, "game_state": {"forest_guardian": True}},
+                {"text": "返回村莊展示力量", "next_id": 24, "game_state": {"village_hero": True}}
+            ]
+        },
+        {
+            "id": 23,
+            "title": "森林的心臟",
+            "content": """你深入森林，來到了一個神秘的聖地。
+
+[[IF explored_deep]]你的勇氣和決心讓你發現了這個秘密。[[ENDIF]]
+[[IF has_ancient_sword]]古劍與聖地產生了共鳴。[[ENDIF]]
+[[IF health >= 90]]你的完美狀態讓你能夠承受聖地的神秘力量。[[ENDIF]]
+[[IF wisdom >= 20]]你的智慧讓你理解了這個地方的真正意義。[[ENDIF]]
+[[IF crossed_bridge]]穿越石橋的勇氣帶你來到了這裡。[[ENDIF]]
+[[IF blessed]]水靈的祝福讓你能夠進入這個神聖的地方。[[ENDIF]]
+[[IF studied_runes]]對符文的研究讓你理解了這個地方的重要性。[[ENDIF]]
+[[IF forest_guardian]]作為森林的守護者，你有責任保護這個聖地。[[ENDIF]]
+
+在聖地的中央，有一個古老的祭壇。祭壇上放著三個神秘的寶珠，每個都散發著不同的能量。
+
+[[IF strength >= 25]]你感覺到紅色寶珠與你的力量產生共鳴。[[ENDIF]]
+[[IF wisdom >= 25]]藍色寶珠似乎在呼喚你的智慧。[[ENDIF]]
+[[IF health >= 90]]綠色寶珠散發著生命的氣息。[[ENDIF]]""",
+            "options": [
+                {"text": "拿取力量寶珠（需要力量 ≥ 20）", "next_id": 25, "game_state": {"chose_power": True, "strength": 15}, "condition": "strength >= 20"},
+                {"text": "拿取智慧寶珠（需要智慧 ≥ 20）", "next_id": 26, "game_state": {"chose_wisdom": True, "wisdom": 15}, "condition": "wisdom >= 20"},
+                {"text": "拿取生命寶珠（需要生命值 ≥ 80）", "next_id": 27, "game_state": {"chose_life": True, "health": 50}, "condition": "health >= 80"}
+            ]
+        },
+        {
+            "id": 24,
+            "title": "歸鄉英雄",
+            "content": """你決定返回村莊，結束這次森林冒險。
+
+[[IF returned_home]]你帶著豐富的經歷回到了家鄉。[[ENDIF]]
+[[IF independent]]你的獨立精神讓你學會了很多。[[ENDIF]]
+[[IF cursed]]儘管受到了詛咒，你仍然活著回來了。[[ENDIF]]
+[[IF storyteller]]你有很多故事可以與村民分享。[[ENDIF]]
+[[IF village_hero]]村民們對你的力量感到敬畏。[[ENDIF]]
+
+村民們聚集在你周圍，聽你講述森林中的冒險經歷。
+
+[[IF has_gold]]你展示了從森林中獲得的金幣。[[ENDIF]]
+[[IF has_ancient_sword]]古劍證明了你的勇氣。[[ENDIF]]
+[[IF has_wisdom_book]]智慧之書讓你成為了村中的賢者。[[ENDIF]]
+
+雖然你沒有找到傳說中的最終寶藏，但你獲得了更寶貴的經驗和智慧。你的冒險故事將激勵下一代的探險者。""",
+            "options": []
+        },
+        {
+            "id": 25,
+            "title": "力量的傳說",
+            "content": """你選擇了力量寶珠，感受到無窮的力量湧入身體。
+
+[[IF chose_power]]你現在擁有了傳說級的力量。[[ENDIF]]
+[[IF strength >= 35]]你的力量已經超越了人類的極限。[[ENDIF]]
+
+突然，森林中出現了一道巨大的石門，阻擋著通往最終寶藏的道路。只有擁有足夠力量的人才能推開它。
+
+[[IF strength >= 40]]你感覺自己絕對有能力推開這道門。[[ENDIF]]
+
+你運用全身的力量，成功推開了傳說中的力量之門！門後是無盡的寶藏和榮耀。
+
+你成為了力量的化身，你的傳說將永遠流傳下去！""",
+            "options": []
+        },
+        {
+            "id": 26,
+            "title": "智慧的啟示",
+            "content": """你選擇了智慧寶珠，感受到無盡的知識湧入腦海。
+
+[[IF chose_wisdom]]你現在擁有了近乎全知的智慧。[[ENDIF]]
+[[IF wisdom >= 35]]你的智慧已經達到了神明的層次。[[ENDIF]]
+
+你突然理解了宇宙的奧秘，森林的所有秘密都向你敞開。你學會了控制自然的力量，能夠與所有生物溝通。
+
+[[IF wisdom >= 40]]你的智慧讓你看透了時間和空間的本質。[[ENDIF]]
+
+你成為了森林的守護者和智慧的象徵。所有尋求知識的人都會來向你請教。
+
+你的智慧將指引世界走向更美好的未來！""",
+            "options": []
+        },
+        {
+            "id": 27,
+            "title": "生命的永恆",
+            "content": """你選擇了生命寶珠，感受到無盡的生命力湧入身體。
+
+[[IF chose_life]]你現在擁有了近乎不朽的生命力。[[ENDIF]]
+[[IF health >= 130]]你的生命力已經超越了凡人的極限。[[ENDIF]]
+
+你的身體變得完美無瑕，所有的傷痛都消失了。你獲得了治療他人的能力，成為了生命的守護者。
+
+[[IF health >= 150]]你的生命力如此強大，甚至能夠復活死者。[[ENDIF]]
+
+森林中的所有生物都感受到了你的生命能量，它們向你表示敬意。你成為了生命的化身。
+
+你將用你的力量治癒世界，帶來和平與繁榮！""",
+            "options": []
+        }
+    ]
+    
+    return chapters_data
+
