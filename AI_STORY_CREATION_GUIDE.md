@@ -27,11 +27,66 @@
 
 #### 條件內容系統
 
-引擎支援強大的條件內容顯示功能，使用 `[[IF condition]]...[[ENDIF]]` 語法。這允許您根據玩家的遊戲狀態動態顯示不同的內容，大幅增加故事的重玩價值和個人化體驗。
+引擎支援強大的條件內容顯示功能，使用 `[[IF condition]]...[[ENDIF]]` 語法。系統支援三種類型的條件判斷：
+
+**1. 布林條件（Boolean Conditions）**
+根據布林變數的真假值顯示內容：
+
+```
+[[IF has_weapon]]你握緊手中的劍，準備迎接挑戰。[[ENDIF]]
+[[IF magic_enhanced]]魔法的力量在你體內流淌。[[ENDIF]]
+[[IF NOT has_key]]門是鎖著的，你需要找到鑰匙。[[ENDIF]]
+```
+
+**2. 數值比較條件（Numeric Comparison）**
+根據數值變數與特定值的比較結果顯示內容，支援六種比較運算子：
+
+```
+[[IF health > 80]]你感覺精力充沛，可以應對任何挑戰。[[ENDIF]]
+[[IF health <= 30]]你感到虛弱無力，每一步都很艱難。[[ENDIF]]
+[[IF strength >= 20]]你的肌肉結實有力，能夠推開沉重的石門。[[ENDIF]]
+[[IF wisdom < 10]]你感到困惑不解，無法理解眼前的謎題。[[ENDIF]]
+[[IF level == 1]]你還是個新手冒險者，對一切都充滿好奇。[[ENDIF]]
+[[IF score != 0]]你目前的分數是 {score} 分。[[ENDIF]]
+```
+
+**3. 支援的比較運算子**
+
+- `>` (大於)
+- `<` (小於)
+- `>=` (大於等於)
+- `<=` (小於等於)
+- `==` (等於)
+- `!=` (不等於)
+
+這種條件內容系統允許您根據玩家的遊戲狀態動態顯示不同的內容，大幅增加故事的重玩價值和個人化體驗。
 
 #### 遊戲狀態變數管理
 
-系統維護一個完整的遊戲狀態物件，記錄玩家在冒險過程中的各種狀態變數。這些變數可以是布林值（如 `has_key`、`found_secret`）或數值（如 `health`、`gold`），為故事邏輯提供豐富的判斷依據。
+系統維護一個完整的遊戲狀態物件，記錄玩家在冒險過程中的各種狀態變數。這些變數分為兩大類型：
+
+**布林變數（Boolean Variables）**
+記錄玩家的行為、擁有的物品或觸發的事件：
+
+- `has_weapon`: 是否擁有武器
+- `has_key`: 是否擁有鑰匙
+- `magic_enhanced`: 是否被魔法增強
+- `talked_to_wizard`: 是否與巫師對話過
+- `found_secret`: 是否發現了秘密
+
+**數值變數（Numeric Variables）**
+記錄角色的屬性、資源或進度：
+
+- `health`: 生命值（通常 0-100）
+- `strength`: 力量值（通常 1-30）
+- `wisdom`: 智慧值（通常 1-30）
+- `courage`: 勇氣值（通常 1-20）
+- `level`: 等級（從 1 開始）
+- `score`: 分數（用於評估表現）
+- `gold`: 金幣數量
+- `experience`: 經驗值
+
+這些變數為故事邏輯提供豐富的判斷依據，讓您能夠創作出真正動態和個人化的故事體驗。
 
 #### 選項與分支管理
 
@@ -503,3 +558,168 @@ python story_converter.py your_story.json --csv your_story.csv
 祝您創作愉快，期待看到您的精彩作品！
 
 ---
+
+**文件版本：** 1.0  
+**最後更新：** 2024 年  
+**聯絡資訊：** 請參考專案文件或技術支援管道
+
+### 數值比較條件的高級運用
+
+#### 生命值管理系統
+
+生命值是最常見的數值變數，需要精心設計以創造緊張感和策略深度。建議將生命值設定在 0-100 的範圍內，並為不同的生命值區間設計相應的條件內容：
+
+```json
+{
+  "content": "你檢視自己的身體狀況。\n\n[[IF health >= 90]]你感覺非常健康，精力充沛，可以應對任何挑戰。[[ENDIF]]\n[[IF health >= 70 AND health < 90]]你的狀態還不錯，雖然有些疲憊但仍能繼續冒險。[[ENDIF]]\n[[IF health >= 40 AND health < 70]]你感到有些虛弱，需要小心行事避免進一步受傷。[[ENDIF]]\n[[IF health >= 20 AND health < 40]]你傷勢不輕，每一步都很艱難，急需治療。[[ENDIF]]\n[[IF health > 0 AND health < 20]]你已經奄奄一息，隨時可能倒下。[[ENDIF]]\n[[IF health <= 0]]你已經無法繼續戰鬥了...遊戲結束。[[ENDIF]]"
+}
+```
+
+#### 屬性檢定機制
+
+力量、智慧、勇氣等屬性可以用來創造條件選項，只有達到特定屬性值的玩家才能選擇某些行動：
+
+```json
+{
+  "options": [
+    {
+      "text": "推開沉重的石門（需要力量 ≥ 18）",
+      "next_id": 15,
+      "condition": "strength >= 18",
+      "game_state": { "opened_door": true, "strength": 2 }
+    },
+    {
+      "text": "解讀古老的符文（需要智慧 ≥ 15）",
+      "next_id": 16,
+      "condition": "wisdom >= 15",
+      "game_state": { "understood_runes": true, "wisdom": 3 }
+    },
+    {
+      "text": "勇敢面對巨龍（需要勇氣 ≥ 20）",
+      "next_id": 17,
+      "condition": "courage >= 20",
+      "game_state": { "faced_dragon": true, "courage": 5 }
+    },
+    {
+      "text": "尋找其他方法",
+      "next_id": 18,
+      "game_state": { "found_alternative": true }
+    }
+  ]
+}
+```
+
+#### 動態難度調整
+
+根據玩家的當前狀態動態調整故事難度，為不同水準的角色提供適當的挑戰：
+
+```json
+{
+  "content": "一群盜賊包圍了你。\n\n[[IF strength >= 25]]憑藉你的強大力量，這些盜賊對你來說不過是小菜一碟。[[ENDIF]]\n[[IF strength >= 15 AND strength < 25]]你有信心應對這些盜賊，但需要小心應戰。[[ENDIF]]\n[[IF strength < 15]]面對這麼多敵人，你感到壓力很大。[[ENDIF]]\n\n[[IF health <= 30]]你的傷勢讓情況變得更加危險。[[ENDIF]]"
+}
+```
+
+#### 累積效果系統
+
+設計需要多次行動才能達成的目標，使用數值變數追蹤進度：
+
+```json
+{
+  "content": "你繼續研究這個複雜的魔法陣。\n\n[[IF research_progress >= 80]]你已經接近完全理解這個魔法陣的奧秘。[[ENDIF]]\n[[IF research_progress >= 50 AND research_progress < 80]]你對魔法陣有了基本的理解。[[ENDIF]]\n[[IF research_progress < 50]]這個魔法陣仍然充滿謎團。[[ENDIF]]",
+  "options": [
+    {
+      "text": "深入研究符文部分",
+      "next_id": 20,
+      "game_state": { "research_progress": 15, "wisdom": 2 }
+    },
+    {
+      "text": "分析能量流向",
+      "next_id": 21,
+      "game_state": { "research_progress": 20, "wisdom": 1 }
+    }
+  ]
+}
+```
+
+#### 資源管理機制
+
+使用數值變數管理有限的資源，增加策略性：
+
+```json
+{
+  "content": "你來到一個神秘的商店。\n\n[[IF gold >= 100]]你有足夠的金幣購買任何想要的物品。[[ENDIF]]\n[[IF gold >= 50 AND gold < 100]]你的金幣足夠購買一些基本物品。[[ENDIF]]\n[[IF gold < 50]]你的金幣不多，需要謹慎選擇。[[ENDIF]]\n[[IF gold == 0]]你身無分文，只能看看而已。[[ENDIF]]",
+  "options": [
+    {
+      "text": "購買魔法劍（100金幣）",
+      "next_id": 25,
+      "condition": "gold >= 100",
+      "game_state": { "gold": -100, "has_magic_sword": true, "strength": 10 }
+    },
+    {
+      "text": "購買治療藥水（50金幣）",
+      "next_id": 26,
+      "condition": "gold >= 50",
+      "game_state": { "gold": -50, "has_healing_potion": true }
+    }
+  ]
+}
+```
+
+#### 等級和經驗系統
+
+實現角色成長機制，讓玩家感受到進步：
+
+```json
+{
+  "content": "經過這次冒險，你獲得了寶貴的經驗。\n\n[[IF experience >= 1000]]你感覺自己已經準備好提升到下一個等級了！[[ENDIF]]\n[[IF level >= 5]]作為一名經驗豐富的冒險者，你對危險有了更敏銳的直覺。[[ENDIF]]\n[[IF level == 1]]雖然你還是新手，但每次經歷都讓你變得更強。[[ENDIF]]",
+  "game_state": {
+    "experience": 150,
+    "level": "{{level + 1 if experience >= 1000 else level}}"
+  }
+}
+```
+
+### 條件內容的創作技巧
+
+#### 層次化條件設計
+
+創建多層次的條件內容，讓不同狀態的玩家都能獲得豐富的體驗：
+
+```json
+{
+  "content": "你面對著古老的石門。\n\n[[IF has_ancient_key]]你拿出古老的鑰匙，門應聲而開。[[ENDIF]]\n[[IF NOT has_ancient_key AND strength >= 20]]雖然沒有鑰匙，但你的強大力量足以推開這扇門。[[ENDIF]]\n[[IF NOT has_ancient_key AND strength < 20 AND wisdom >= 18]]你仔細觀察，發現了隱藏的機關。[[ENDIF]]\n[[IF NOT has_ancient_key AND strength < 20 AND wisdom < 18]]這扇門似乎無法打開，你需要想其他辦法。[[ENDIF]]"
+}
+```
+
+#### 狀態組合效果
+
+設計需要多個條件同時滿足的特殊內容：
+
+```json
+{
+  "content": "你來到了傳說中的聖地。\n\n[[IF has_holy_symbol AND wisdom >= 20 AND courage >= 15]]你同時擁有聖物、智慧和勇氣，聖地的守護者決定傳授你最高級的法術。[[ENDIF]]\n[[IF has_holy_symbol AND wisdom >= 20]]聖物和你的智慧讓守護者對你刮目相看。[[ENDIF]]\n[[IF has_holy_symbol]]聖物在這裡散發出溫暖的光芒。[[ENDIF]]"
+}
+```
+
+#### 負面狀態處理
+
+不要忽視低屬性值或負面狀態的玩家，為他們也提供有趣的內容：
+
+```json
+{
+  "content": "智者看著你，若有所思。\n\n[[IF wisdom >= 20]]「你的智慧令人印象深刻，」智者說道。[[ENDIF]]\n[[IF wisdom < 10]]「年輕人，智慧不是天生的，」智者溫和地說，「讓我教你一些基本的道理。」[[ENDIF]]",
+  "options": [
+    {
+      "text": "請求高級指導（需要智慧 ≥ 15）",
+      "next_id": 30,
+      "condition": "wisdom >= 15",
+      "game_state": { "received_advanced_teaching": true, "wisdom": 5 }
+    },
+    {
+      "text": "請求基礎教學",
+      "next_id": 31,
+      "game_state": { "received_basic_teaching": true, "wisdom": 3 }
+    }
+  ]
+}
+```

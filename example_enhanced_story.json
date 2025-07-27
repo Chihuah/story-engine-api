@@ -1,0 +1,332 @@
+{
+  "story_id": "enhanced_adventure",
+  "title": "增強冒險：數值系統示範",
+  "description": "一個展示數值比較條件系統的完整冒險故事，包含生命值、力量、智慧等屬性管理",
+  "author": "Story Engine Team",
+  "version": "2.0",
+  "chapters": [
+    {
+      "id": 1,
+      "title": "冒險者的起點",
+      "content": "你是一名年輕的冒險者，剛剛踏出新手村。\n\n你的當前狀態：\n[[IF health >= 80]]你感覺身體健康，精力充沛。[[ENDIF]]\n[[IF health < 80]]你感覺有些疲憊，需要小心行事。[[ENDIF]]\n[[IF strength >= 15]]你的肌肉結實有力。[[ENDIF]]\n[[IF wisdom >= 12]]你的頭腦清晰敏銳。[[ENDIF]]\n\n前方有三條道路，每條都通向不同的冒險...",
+      "options": [
+        {
+          "text": "前往危險的山洞（需要勇氣）",
+          "next_id": 2,
+          "game_state": {
+            "chose_danger": true,
+            "location": "cave"
+          }
+        },
+        {
+          "text": "拜訪智者的塔樓（需要智慧）",
+          "next_id": 3,
+          "game_state": {
+            "chose_wisdom": true,
+            "location": "tower"
+          }
+        },
+        {
+          "text": "進入訓練場（提升能力）",
+          "next_id": 4,
+          "game_state": {
+            "chose_training": true,
+            "location": "training"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "黑暗山洞",
+      "content": "你進入了一個陰暗潮濕的山洞。\n\n[[IF chose_danger]]你的勇敢選擇讓你在黑暗中保持冷靜。[[ENDIF]]\n[[IF health > 50]]你的良好體力讓你能夠應對山洞中的挑戰。[[ENDIF]]\n[[IF health <= 50]]你感到體力不支，每一步都很艱難。[[ENDIF]]\n\n突然，一隻巨大的洞穴熊出現在你面前！\n\n[[IF strength >= 18]]你感覺自己有足夠的力量與它正面對抗。[[ENDIF]]\n[[IF strength < 18]]你意識到正面對抗可能不是明智的選擇。[[ENDIF]]",
+      "options": [
+        {
+          "text": "與熊戰鬥（需要力量 ≥ 18）",
+          "next_id": 5,
+          "game_state": {
+            "fought_bear": true,
+            "health": -20
+          },
+          "condition": "strength >= 18"
+        },
+        {
+          "text": "嘗試智取（需要智慧 ≥ 15）",
+          "next_id": 6,
+          "game_state": {
+            "outsmarted_bear": true,
+            "wisdom": 2
+          },
+          "condition": "wisdom >= 15"
+        },
+        {
+          "text": "逃跑",
+          "next_id": 7,
+          "game_state": {
+            "fled_bear": true,
+            "health": -5,
+            "courage": -1
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "智者的塔樓",
+      "content": "你來到了一座高聳的石塔，這裡是著名智者的居所。\n\n[[IF chose_wisdom]]你對知識的渴望讓智者對你印象深刻。[[ENDIF]]\n[[IF wisdom >= 15]]智者看出了你的潛力，決定傳授你更深奧的知識。[[ENDIF]]\n[[IF wisdom < 15]]智者認為你還需要更多的學習和思考。[[ENDIF]]\n\n智者給你出了一道謎題：「什麼東西越分享越多？」\n\n[[IF wisdom >= 12]]你思考著這個問題，感覺答案就在嘴邊。[[ENDIF]]",
+      "options": [
+        {
+          "text": "回答：知識（需要智慧 ≥ 12）",
+          "next_id": 8,
+          "game_state": {
+            "solved_riddle": true,
+            "wisdom": 5,
+            "has_wisdom_scroll": true
+          },
+          "condition": "wisdom >= 12"
+        },
+        {
+          "text": "回答：愛",
+          "next_id": 9,
+          "game_state": {
+            "partial_correct": true,
+            "wisdom": 2
+          }
+        },
+        {
+          "text": "承認不知道",
+          "next_id": 10,
+          "game_state": {
+            "honest": true,
+            "wisdom": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "訓練場",
+      "content": "你進入了一個寬敞的訓練場，這裡有各種訓練設施。\n\n[[IF chose_training]]你明智地選擇了提升自己的能力。[[ENDIF]]\n\n訓練師看了看你，說道：「年輕人，你想要訓練什麼？\"\n\n[[IF strength < 20]]\"你的力量還有提升空間。\"[[ENDIF]]\n[[IF health < 100]]\"你的體力需要加強。\"[[ENDIF]]\n[[IF wisdom < 20]]\"你的智慧可以更進一步。\"[[ENDIF]]",
+      "options": [
+        {
+          "text": "力量訓練",
+          "next_id": 11,
+          "game_state": {
+            "trained_strength": true,
+            "strength": 5,
+            "health": -10
+          }
+        },
+        {
+          "text": "體力訓練",
+          "next_id": 12,
+          "game_state": {
+            "trained_health": true,
+            "health": 20,
+            "strength": 2
+          }
+        },
+        {
+          "text": "智慧訓練",
+          "next_id": 13,
+          "game_state": {
+            "trained_wisdom": true,
+            "wisdom": 5,
+            "health": -5
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "勇敢的戰鬥",
+      "content": "你決定與洞穴熊正面對抗！\n\n[[IF fought_bear]]戰鬥激烈而危險。[[ENDIF]]\n[[IF strength >= 20]]你的強大力量讓你在戰鬥中佔據上風。[[ENDIF]]\n[[IF health <= 30]]戰鬥讓你受了重傷，你感到頭暈目眩。[[ENDIF]]\n[[IF health <= 0]]你的傷勢過重，意識開始模糊...[[ENDIF]]\n\n經過激烈的戰鬥，你終於擊敗了洞穴熊。在熊的巢穴深處，你發現了一把古老的劍和一瓶治療藥水。\n\n[[IF health > 0]]雖然受了傷，但你成功地完成了這次冒險。[[ENDIF]]",
+      "options": [
+        {
+          "text": "使用治療藥水",
+          "next_id": 14,
+          "game_state": {
+            "used_potion": true,
+            "health": 30,
+            "has_ancient_sword": true
+          }
+        },
+        {
+          "text": "保存藥水，拿起古劍",
+          "next_id": 15,
+          "game_state": {
+            "saved_potion": true,
+            "has_healing_potion": true,
+            "has_ancient_sword": true,
+            "strength": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "智慧的勝利",
+      "content": "你決定用智慧來解決這個問題。\n\n[[IF outsmarted_bear]]你的聰明才智派上了用場。[[ENDIF]]\n[[IF wisdom >= 18]]你的高智慧讓你想出了完美的解決方案。[[ENDIF]]\n\n你注意到熊的行為模式，發現它只是在保護自己的幼崽。你慢慢後退，並用手勢表示自己沒有惡意。\n\n熊逐漸放鬆警惕，甚至帶你到了一個隱秘的寶藏室。作為對你智慧的獎勵，熊允許你拿走一件寶物。",
+      "options": [
+        {
+          "text": "選擇智慧之書",
+          "next_id": 16,
+          "game_state": {
+            "has_wisdom_book": true,
+            "wisdom": 8,
+            "bear_friend": true
+          }
+        },
+        {
+          "text": "選擇力量護符",
+          "next_id": 17,
+          "game_state": {
+            "has_strength_amulet": true,
+            "strength": 6,
+            "bear_friend": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "戰略性撤退",
+      "content": "你明智地選擇了撤退。\n\n[[IF fled_bear]]有時候撤退是最好的選擇。[[ENDIF]]\n[[IF health < 50]]你的體力不足，撤退是正確的決定。[[ENDIF]]\n[[IF courage < 0]]這次撤退讓你對自己的勇氣產生了懷疑。[[ENDIF]]\n\n在撤退的路上，你遇到了一位經驗豐富的冒險者。他看出了你的困擾，決定給你一些建議和幫助。",
+      "options": [
+        {
+          "text": "請求訓練指導",
+          "next_id": 18,
+          "game_state": {
+            "received_training": true,
+            "strength": 3,
+            "wisdom": 3,
+            "courage": 2
+          }
+        },
+        {
+          "text": "請求裝備幫助",
+          "next_id": 19,
+          "game_state": {
+            "received_equipment": true,
+            "has_basic_sword": true,
+            "has_leather_armor": true,
+            "health": 10
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "智慧的獎賞",
+      "content": "「正確！」智者讚許地點頭。\n\n[[IF solved_riddle]]你的智慧得到了智者的認可。[[ENDIF]]\n[[IF wisdom >= 17]]你現在的智慧已經達到了相當高的水準。[[ENDIF]]\n[[IF has_wisdom_scroll]]智者給了你一卷珍貴的智慧卷軸。[[ENDIF]]\n\n智者說：「知識確實是越分享越多的東西。作為獎勵，我將傳授你古老的魔法知識。」\n\n你學會了一個強大的治療法術，這將在你的冒險中發揮重要作用。",
+      "options": [
+        {
+          "text": "學習更多魔法",
+          "next_id": 20,
+          "game_state": {
+            "learned_magic": true,
+            "has_heal_spell": true,
+            "has_shield_spell": true,
+            "wisdom": 3
+          }
+        },
+        {
+          "text": "詢問冒險建議",
+          "next_id": 21,
+          "game_state": {
+            "received_advice": true,
+            "knows_secret_path": true,
+            "wisdom": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "恢復活力",
+      "content": "你喝下了治療藥水，感到傷口迅速癒合。\n\n[[IF used_potion]]藥水的效果非常顯著。[[ENDIF]]\n[[IF health >= 50]]你現在感覺好多了，可以繼續冒險。[[ENDIF]]\n[[IF has_ancient_sword]]古劍在你手中散發著神秘的光芒。[[ENDIF]]\n\n[[IF health >= 80]]你的體力已經完全恢復，感覺比以前更強壯。[[ENDIF]]\n[[IF health < 80]]雖然好了很多，但你仍需要小心行事。[[ENDIF]]\n\n現在你必須決定下一步的行動。洞穴深處似乎還有更多的秘密等待發現。",
+      "options": [
+        {
+          "text": "探索洞穴深處（需要生命值 ≥ 60）",
+          "next_id": 22,
+          "game_state": {
+            "explored_deep": true
+          },
+          "condition": "health >= 60"
+        },
+        {
+          "text": "離開洞穴",
+          "next_id": 23,
+          "game_state": {
+            "left_cave": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "title": "洞穴的秘密",
+      "content": "你深入洞穴，發現了一個古老的地下神廟。\n\n[[IF explored_deep]]你的勇氣讓你發現了這個驚人的秘密。[[ENDIF]]\n[[IF has_ancient_sword]]古劍與神廟產生了共鳴，發出更亮的光芒。[[ENDIF]]\n[[IF health >= 80]]你的良好狀態讓你能夠充分探索這個神廟。[[ENDIF]]\n\n神廟中央有一個祭壇，上面放著三個神秘的寶珠。每個寶珠都散發著不同的能量。\n\n[[IF wisdom >= 15]]你的智慧讓你意識到這些寶珠可能有特殊的力量。[[ENDIF]]",
+      "options": [
+        {
+          "text": "選擇紅色寶珠（力量）",
+          "next_id": 24,
+          "game_state": {
+            "chose_strength_orb": true,
+            "strength": 10,
+            "has_power_orb": true
+          }
+        },
+        {
+          "text": "選擇藍色寶珠（智慧）",
+          "next_id": 25,
+          "game_state": {
+            "chose_wisdom_orb": true,
+            "wisdom": 10,
+            "has_wisdom_orb": true
+          }
+        },
+        {
+          "text": "選擇綠色寶珠（生命）",
+          "next_id": 26,
+          "game_state": {
+            "chose_health_orb": true,
+            "health": 50,
+            "has_life_orb": true
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "title": "力量的極限",
+      "content": "你選擇了紅色的力量寶珠。\n\n[[IF chose_strength_orb]]寶珠的能量湧入你的身體。[[ENDIF]]\n[[IF strength >= 25]]你現在擁有了超人般的力量！[[ENDIF]]\n[[IF has_power_orb]]力量寶珠與你融為一體。[[ENDIF]]\n\n突然，神廟開始震動。一道巨大的石門擋住了出路，只有極大的力量才能推開它。\n\n[[IF strength >= 30]]你感覺自己有足夠的力量推開這道門。[[ENDIF]]\n[[IF strength < 30]]這道門看起來非常沉重，你可能需要想其他辦法。[[ENDIF]]",
+      "options": [
+        {
+          "text": "用力推門（需要力量 ≥ 30）",
+          "next_id": 27,
+          "game_state": {
+            "opened_door": true,
+            "strength": 5
+          },
+          "condition": "strength >= 30"
+        },
+        {
+          "text": "尋找機關",
+          "next_id": 28,
+          "game_state": {
+            "found_mechanism": true,
+            "wisdom": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "title": "力量的勝利",
+      "content": "你運用全身的力量，成功推開了巨大的石門！\n\n[[IF opened_door]]你的超人力量創造了奇蹟。[[ENDIF]]\n[[IF strength >= 35]]你現在的力量已經達到了傳說級別。[[ENDIF]]\n\n門後是一個充滿寶藏的密室。金幣、寶石、魔法物品應有盡有。在寶藏的中央，有一把傳說中的神劍。\n\n[[IF has_ancient_sword]]你手中的古劍與神劍產生了共鳴。[[ENDIF]]\n\n你成為了一名真正的英雄，你的力量將被後世傳頌！",
+      "options": []
+    }
+  ]
+}
+

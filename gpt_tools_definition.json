@@ -3,23 +3,90 @@
     {
       "type": "function",
       "function": {
-        "name": "story_engine",
-        "description": "載入故事章節內容與選項，支援根據遊戲狀態進行條件內容解析。用於驅動互動式冒險故事的章節導航。",
+        "name": "list_available_stories",
+        "description": "取得所有可用的故事列表，讓玩家選擇要遊玩的故事。這是開始遊戲時的第一步。",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_story_info",
+        "description": "取得特定故事的詳細資訊，包括標題、描述、作者等元資料。",
         "parameters": {
           "type": "object",
           "properties": {
+            "story_id": {
+              "type": "string",
+              "description": "故事的唯一識別ID，例如 'forest_adventure' 或 'space_odyssey'"
+            }
+          },
+          "required": ["story_id"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_story_chapters",
+        "description": "取得指定故事的所有章節列表，用於了解故事結構或除錯。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "story_id": {
+              "type": "string",
+              "description": "故事的唯一識別ID"
+            }
+          },
+          "required": ["story_id"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "get_story_chapter",
+        "description": "載入指定故事的特定章節內容，支援條件內容解析和遊戲狀態管理。這是遊戲進行的核心功能。支援的條件語法：1) 布林條件：[[IF has_weapon]]...[[ENDIF]] 2) 數值比較：[[IF health > 50]]...[[ENDIF]]、[[IF strength >= 20]]...[[ENDIF]]、[[IF wisdom < 15]]...[[ENDIF]]、[[IF level == 5]]...[[ENDIF]]、[[IF score != 0]]...[[ENDIF]] 3) 否定條件：[[IF NOT has_key]]...[[ENDIF]]",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "story_id": {
+              "type": "string",
+              "description": "故事的唯一識別ID，例如 'forest_adventure'"
+            },
             "chapter_id": {
               "type": "integer",
-              "description": "要載入的章節 ID，從 1 開始的正整數",
-              "minimum": 1
+              "description": "章節ID，要載入的章節編號"
             },
             "game_state": {
               "type": "object",
-              "description": "當前遊戲狀態變數，用於條件內容解析。例如：{'found_secret_path': true, 'has_key': false}",
-              "additionalProperties": true
+              "description": "當前遊戲狀態，包含布林變數（如 has_weapon: true）和數值變數（如 health: 100, strength: 15, wisdom: 12）。數值變數支援比較運算：>, <, >=, <=, ==, !=。常見的數值變數包括：health（生命值）、strength（力量）、wisdom（智慧）、courage（勇氣）、level（等級）、score（分數）等。",
+              "additionalProperties": true,
+              "examples": {
+                "basic_state": {
+                  "health": 100,
+                  "strength": 15,
+                  "wisdom": 12,
+                  "has_weapon": false
+                },
+                "advanced_state": {
+                  "health": 75,
+                  "strength": 20,
+                  "wisdom": 18,
+                  "courage": 8,
+                  "level": 3,
+                  "has_weapon": true,
+                  "has_potion": true,
+                  "magic_enhanced": true
+                }
+              }
             }
           },
-          "required": ["chapter_id"]
+          "required": ["story_id", "chapter_id", "game_state"]
         }
       }
     },
@@ -27,27 +94,194 @@
       "type": "function",
       "function": {
         "name": "roll_dice",
-        "description": "執行擲骰子檢定，支援多面數與多顆骰子。用於解決故事中的隨機事件和技能檢定。",
+        "description": "執行擲骰子檢定，支援多面數和多顆骰子。常用於技能檢定、戰鬥傷害、隨機事件等。",
         "parameters": {
           "type": "object",
           "properties": {
+            "dice_count": {
+              "type": "integer",
+              "description": "骰子數量 (1-100)",
+              "minimum": 1,
+              "maximum": 100
+            },
             "dice_sides": {
               "type": "integer",
-              "description": "骰子的面數（如 6 代表六面骰，20 代表二十面骰）",
+              "description": "骰子面數 (2-100)，常用：D4, D6, D8, D10, D12, D20, D100",
               "minimum": 2,
               "maximum": 100
             },
-            "dice_count": {
+            "modifier": {
               "type": "integer",
-              "description": "要擲的骰子數量",
-              "minimum": 1,
-              "maximum": 100
+              "description": "修正值 (可選)，可為正數或負數",
+              "default": 0
             }
           },
-          "required": ["dice_sides", "dice_count"]
+          "required": ["dice_count", "dice_sides"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "export_story",
+        "description": "匯出指定故事為 JSON 格式，用於備份或分享故事內容。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "story_id": {
+              "type": "string",
+              "description": "要匯出的故事ID"
+            }
+          },
+          "required": ["story_id"]
         }
       }
     }
-  ]
+  ],
+  "api_endpoints": {
+    "base_url": "https://your-api-domain.com",
+    "endpoints": {
+      "list_stories": {
+        "method": "GET",
+        "path": "/api/stories",
+        "description": "取得所有故事列表"
+      },
+      "get_story": {
+        "method": "GET", 
+        "path": "/api/stories/{story_id}",
+        "description": "取得特定故事資訊"
+      },
+      "get_story_chapters": {
+        "method": "GET",
+        "path": "/api/stories/{story_id}/chapters", 
+        "description": "取得故事章節列表"
+      },
+      "get_story_chapter": {
+        "method": "POST",
+        "path": "/api/story_engine/{story_id}/{chapter_id}",
+        "description": "載入故事章節內容"
+      },
+      "roll_dice": {
+        "method": "POST",
+        "path": "/api/roll_dice",
+        "description": "執行擲骰檢定"
+      },
+      "export_story": {
+        "method": "GET",
+        "path": "/api/stories/{story_id}/export",
+        "description": "匯出故事為 JSON"
+      }
+    }
+  },
+  "usage_examples": {
+    "start_game": {
+      "description": "開始遊戲的標準流程",
+      "steps": [
+        "1. 呼叫 list_available_stories() 取得故事列表",
+        "2. 讓玩家選擇想要的故事",
+        "3. 呼叫 get_story_chapter(story_id, 1, {health: 100, strength: 15, wisdom: 12}) 開始第一章",
+        "4. 根據玩家選擇更新 game_state",
+        "5. 繼續呼叫後續章節"
+      ]
+    },
+    "dice_rolling": {
+      "description": "擲骰檢定的使用時機",
+      "examples": [
+        "技能檢定：roll_dice(1, 20, 3) - 1D20+3",
+        "傷害計算：roll_dice(2, 6, 0) - 2D6",
+        "隨機事件：roll_dice(1, 100, 0) - 1D100",
+        "屬性檢定：roll_dice(3, 6, 0) - 3D6 生成屬性值"
+      ]
+    },
+    "game_state_management": {
+      "description": "遊戲狀態管理範例",
+      "examples": {
+        "initial_state": {
+          "health": 100,
+          "strength": 15,
+          "wisdom": 12,
+          "courage": 10
+        },
+        "after_combat": {
+          "health": 75,
+          "strength": 15,
+          "wisdom": 12,
+          "courage": 12,
+          "has_weapon": true,
+          "battle_won": true
+        },
+        "after_magic_enhancement": {
+          "health": 120,
+          "strength": 20,
+          "wisdom": 18,
+          "courage": 15,
+          "has_weapon": true,
+          "magic_enhanced": true,
+          "has_potion": true
+        }
+      }
+    }
+  },
+  "conditional_content_syntax": {
+    "description": "條件內容語法說明 - 支援布林條件和數值比較",
+    "syntax": "[[IF condition]]內容[[ENDIF]]",
+    "boolean_examples": [
+      "[[IF has_weapon]]你握緊手中的劍。[[ENDIF]]",
+      "[[IF NOT has_key]]門是鎖著的。[[ENDIF]]",
+      "[[IF magic_enhanced]]魔法力量在你體內流淌。[[ENDIF]]"
+    ],
+    "numeric_examples": [
+      "[[IF health > 80]]你感覺精力充沛。[[ENDIF]]",
+      "[[IF health <= 30]]你感到虛弱無力。[[ENDIF]]",
+      "[[IF strength >= 20]]你的肌肉結實有力。[[ENDIF]]",
+      "[[IF wisdom < 10]]你感到困惑不解。[[ENDIF]]",
+      "[[IF level == 1]]你還是個新手冒險者。[[ENDIF]]",
+      "[[IF score != 0]]你的分數是 {score} 分。[[ENDIF]]"
+    ],
+    "supported_operators": [
+      "> (大於)",
+      "< (小於)", 
+      ">= (大於等於)",
+      "<= (小於等於)",
+      "== (等於)",
+      "!= (不等於)"
+    ]
+  },
+  "story_structure": {
+    "description": "故事結構設計指南",
+    "chapter_types": [
+      "起始章節：通常是第1章，設定故事背景和初始狀態",
+      "分支章節：提供多個選擇，影響故事走向和角色屬性",
+      "條件章節：根據遊戲狀態顯示不同內容",
+      "檢定章節：需要擲骰或屬性檢定的章節",
+      "結局章節：故事的結束，通常沒有選項"
+    ],
+    "best_practices": [
+      "每個章節應該有清楚的標題和豐富的內容",
+      "選項應該有意義且影響後續劇情或角色屬性",
+      "善用條件內容增加重玩價值",
+      "數值變化應該合理且有戲劇效果",
+      "結局應該反映玩家的選擇和最終狀態",
+      "適當使用擲骰檢定增加不確定性和挑戰性"
+    ]
+  },
+  "numeric_state_design": {
+    "description": "數值狀態設計指南",
+    "common_attributes": {
+      "health": "生命值，通常 0-100，低於 0 可能導致遊戲結束",
+      "strength": "力量值，影響戰鬥和物理挑戰",
+      "wisdom": "智慧值，影響謎題解決和魔法使用",
+      "courage": "勇氣值，影響面對危險時的選項",
+      "level": "等級，代表角色成長",
+      "score": "分數，用於評估玩家表現"
+    },
+    "design_principles": [
+      "設定合理的初始值和變化範圍",
+      "屬性變化應該有明確的原因和後果",
+      "使用條件內容反映不同屬性水準的差異",
+      "考慮屬性間的平衡和互動關係",
+      "為極端值（過高或過低）設計特殊內容"
+    ]
+  }
 }
 
