@@ -151,7 +151,7 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()me.utcnow, onupdate=datetime.utcnow, comment="更新時間")
+        db.close()
     
     def __repr__(self):
         return f"<Chapter(id={self.id}, title='{self.title[:20]}...')>"
