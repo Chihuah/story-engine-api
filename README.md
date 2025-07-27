@@ -511,7 +511,8 @@ flowchart TD
 
 #### 利用 AI 來創作互動式冒險故事
 
-可利用 [AI_STORY_CREATION_GUIDE.md](AI_STORY_CREATION_GUIDE.md) 此故事生成指引（提示詞/上下文脈絡），給予大型語言模型來創作。並且搭配 [example_simple_story.json](example_simple_story.json) 做為範例，使其生成符合本專案的 json 格式。自創故事可用上述管理工具驗證後匯入至資料庫。
+可利用 [AI_STORY_CREATION_GUIDE.md](AI_STORY_CREATION_GUIDE.md) 此故事生成指引（提示詞/上下文脈絡），給予大型語言模型來創作。
+並且搭配 [example_story.json](example_story.json) 做為範例，使其生成符合本專案的 json 格式。自創故事可用上述管理工具驗證後匯入至資料庫。
 
 ## 🤖 GPT 整合
 
