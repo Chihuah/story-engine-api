@@ -559,10 +559,6 @@ python story_converter.py your_story.json --csv your_story.csv
 
 ---
 
-**文件版本：** 1.0  
-**最後更新：** 2024 年  
-**聯絡資訊：** 請參考專案文件或技術支援管道
-
 ### 數值比較條件的高級運用
 
 #### 生命值管理系統
